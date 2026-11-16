@@ -1948,6 +1948,40 @@ count = 7
 site = 0xC1B021
 count = 41
 
+# Mode7Script_Dispatch low-nibble ops: EventCmd_LowNibbleJumpTable, AND #$0F,
+# 16 words at $C30B74-$C30B93 (the last, $C30B95, is the code after the table).
+[[jumptable]]
+site = 0xC30B71
+count = 16
+
+# BattleBg_BuildScrollHdmaTables: DATA8_CD06BC, 4 words at $CD06BC-$CD06C3
+# (code follows).
+[[jumptable]]
+site = 0xCD06B9
+count = 4
+
+# ---- hand-offs and declared exits ----
+
+# Pad_ReadAndDecode: L+R+Start+Select (pad = $3030) JMLs to $C0FF00, the soft
+# reset (SEI, XCE, JML Boot_Main): the stack and the machine restart, nothing
+# returns to the caller (docs/KNOWN-ISSUES.md, soft_reset replay).
+[[handoff]]
+site = 0xC28523
+
+# Battle_Bootstrap is entered by Battle_Main's JMP/JML chain and saves the
+# caller's P first (PHP at $CFFB65, M=1 X=0 on entry); the battle ends in
+# Battle_TeardownAndExitToField (JML $CFFBE5), whose PLP / RTL give it back.
+[[exit]]
+addr = 0xCFFB65
+state = "m1x0"
+returns = "RTL"
+exit_state = "m1x0"
+
+# Not registered on purpose: $C198C5 (EnemyAI action-prep case 4). It ends in
+# JMP $8C90 into the loop that calls it, so as an entry it would swallow that
+# loop and its callee's RTS would be ambiguous. tools/discover.py proposes it
+# (a table case run interpreted); leave it interpreted until $C18C90 is an entry.
+
 # Manual root: field-engine cold entry, reached from reset (not called).
 # Entry native, M=1 X=0, DP=$2100, DB=$00, S=$06FF. Seeds M/X propagation
 # for sync_symbols.py; held back from emission until everything it reaches
@@ -6312,7 +6346,7 @@ module = "bankc7"
 [[func]]
 name = "MainInit"
 addr = 0xFDC000
-states = ["m1x0"]
+states = ["m1x0", "m0x0"]
 e = 0
 module = "bankfd"
 
@@ -7248,7 +7282,7 @@ source = "profile"
 [[func]]
 name = "Sub_C06FB9"
 addr = 0xC06FB9
-states = ["m1x1"]
+states = ["m1x1", "m0x1"]
 e = 0
 module = "bankc0"
 source = "profile"
@@ -7256,7 +7290,7 @@ source = "profile"
 [[func]]
 name = "Sub_C06FBA"
 addr = 0xC06FBA
-states = ["m1x1"]
+states = ["m1x1", "m0x1"]
 e = 0
 module = "bankc0"
 source = "profile"
@@ -10919,3 +10953,12 @@ states = ["m1x0"]
 e = 0
 module = "bankcf"
 source = "profile"
+
+# Mode7Script_Dispatch's $8x op calls it (JSR $C30C92 at $C30C8C) and its $9x
+# op jumps to it; M=0 X=0 as in the dispatcher (no REP/SEP in between).
+[[func]]
+name = "Mode7Script_DoLoop"
+addr = 0xC30C92
+states = ["m0x0"]
+e = 0
+module = "bankc3"
