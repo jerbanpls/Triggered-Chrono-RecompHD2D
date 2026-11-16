@@ -574,6 +574,8 @@ def _next_state(i: Insn, st: State) -> State:
         else:
             item = None
         return State(st.m, st.x, st.e, st.stack + (item,) * size, st.stack_lost)
+    if mn in ('TCS', 'TXS'):   # the stack pointer is reloaded: nothing pushed so far is below it
+        return State(st.m, st.x, st.e, (), True)
     if mn in _PULL:
         size = _stack_size(_PULL[mn], st, i.addr, mn)
         stack, lost = st.stack, st.stack_lost
@@ -626,6 +628,10 @@ class Function:
     # (abs,X) table key -> targets of it run through the interpreter (not
     # compiled for the state, or exits unknown); the others stay compiled
     table_interp: dict = field(default_factory=dict)
+    # PLP whose M/X result is unknown (the pulled byte was pushed before
+    # entry, or the stack pointer was reloaded): key -> next address. The
+    # pull is done in C and the rest runs through the interpreter's dispatch.
+    plp_interp: dict = field(default_factory=dict)
 
     @property
     def size(self) -> int:
@@ -681,6 +687,10 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
             mn = i.mnemonic
             if mn in RETURNS:
                 fn.exit_states.add((mn, nxt.m, nxt.x))
+                break
+            if mn == 'PLP' and not nxt.e and (nxt.m is None or nxt.x is None):
+                fn.plp_interp[ikey] = i.next_addr
+                fn.exit_states.add(('?', None, None))
                 break
             if mn in BRANCHES:
                 work.append((i.branch_target(), nxt))

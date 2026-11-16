@@ -117,5 +117,16 @@ for op, what in ((0x6C, 'JMP (abs)'), (0xDC, 'JML [abs]')):
         else ['cpu->PB = 0xE4;']
     check(all(w in src for w in want), what + ': emits bank-0 pointer read and interpreter dispatch')
 
+# PLP of a byte pushed before entry: M/X unknown, the rest is interpreted
+fn = decode.decode_function(rom_with(bytes([0x28, 0xFA, 0x60])), 0xE48000, m1x0, Dyn())
+check(list(fn.plp_interp) and [i.addr for i in fn.insns] == [0xE48000], 'PLP of unknown M/X: path ends')
+fm = funcs.FuncMeta('T', 0xE48000, ('m1x0',), 0, None, None, 'bankE4')
+src = '\n'.join(emit.emit_function(fm, fn))
+check('set_p(cpu, pull8(cpu));' in src and 'cpu->PC = 0x8001;' in src and 'ct_tail_rest(cpu, s0);' in src,
+      'PLP of unknown M/X: emits the pull and the interpreter hand-off')
+# PHP, TCS, PLP: the stack pointer was reloaded, so the pushed P is not the one pulled
+fn = decode.decode_function(rom_with(bytes([0x08, 0x1B, 0x28, 0xFA, 0x60])), 0xE48000, m1x0, Dyn())
+check(list(fn.plp_interp), 'TCS drops the tracked stack')
+
 print(f"decode_calls: {'ok' if not fails else str(fails) + ' failed'}")
 sys.exit(1 if fails else 0)

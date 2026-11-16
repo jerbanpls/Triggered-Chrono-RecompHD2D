@@ -316,6 +316,16 @@ def callee(target: int, st: decode.State) -> str:
     return f'ct_hook_{ext.hook}' if ext else c_name(target, st)
 
 
+def _reloads_stack(fn: decode.Function) -> bool:
+    """A routine that hands its rest to the interpreter after its stack
+    moved: a PLP of unknown M/X, or a run-time JMP (abs) / JML [abs] in code
+    that loads S (a task switch)."""
+    if fn.plp_interp:
+        return True
+    dyn = any(i.opcode in (0x6C, 0xDC) and i.key in fn.dyn_tables for i in fn.insns)
+    return dyn and any(i.mnemonic in ('TCS', 'TXS') for i in fn.insns)
+
+
 def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
     st = fn.state
     lines = [
@@ -330,6 +340,12 @@ def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
     # came back elsewhere: ops.h cpu_return_ok)
     lines.append('    const uint16_t s0 = cpu->S;   /* the return address sits above */')
     lines.append('    (void)s0;')
+    if _reloads_stack(fn):
+        # code that reloads S or pulls what its caller pushed: "the function's
+        # own return" (S above s0) means nothing to the system-less executor,
+        # so without the scheduler (diff_all) the oracle runs the whole routine
+        lines.append('    if (!ct_exec_hook) { (void)ct_call_interp(cpu, '
+                     f'0x{fm.addr:06X}, ~0u, 0); return; }}')
     keys = {i.key for i in fn.insns}
     per_addr: dict[int, int] = {}
     for i in fn.insns:
@@ -538,7 +554,10 @@ def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
             raise EmitError(f'${i.addr:06X}: {i.text()} (opcode ${i.opcode:02X}, '
                             f'width {w or "-"}) not implemented')
         body = t(i)
-        if i.mnemonic == 'PLP':
+        if i.key in fn.plp_interp:   # unknown M/X after the pull: the rest is interpreted
+            body += [f'cpu->PB = 0x{i.addr >> 16:02X};', f'cpu->PC = 0x{i.next_addr & 0xFFFF:04X};',
+                     'ct_interp_rest(cpu, s0);', 'return;']
+        elif i.mnemonic == 'PLP':
             if post[0] is None or post[1] is None:
                 raise EmitError(f'${i.addr:06X}: PLP restores unknown M/X')
             body.append(f'cpu_check_mx(cpu, 0x{i.addr:06X}, {int(post[0])}, {int(post[1])});')
@@ -552,6 +571,8 @@ def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
                 body.append(f'if (cpu->m == {int(k[0])} && cpu->x == {int(k[1])}) '
                             f'goto {label(i.next_addr, k)};')
             body.append(f'ct_fatal("${i.addr:06X}: callee returned with m%d x%d", cpu->m, cpu->x);')
+        elif i.key in fn.plp_interp:
+            pass
         elif i.mnemonic not in NO_FALLTHROUGH:
             succ = (i.next_addr,) + post
             if nxt is None or nxt.key != succ:
