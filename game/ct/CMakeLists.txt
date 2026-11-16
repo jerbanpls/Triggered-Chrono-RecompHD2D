@@ -357,6 +357,16 @@ add_test(NAME native_coverage COMMAND ct_boot --frames 11000 --min-native 49
     --script ${GAME_DIR}/test/replay/gato_battle.txt)
 list(APPEND ct_game_tests native_coverage)
 
+# Interpreter share per replay must not rise above its recorded ceiling
+# (upstream issue #108; test/interp_ceilings.txt, lower-only).
+foreach(r leene_square gato_battle gato_win soft_reset world_map_save
+          coop_battle coop_field coop_mash coop_split)
+    add_test(NAME interp_share_${r} COMMAND ${Python3_EXECUTABLE}
+        ${GAME_DIR}/test/test_interp_share.py $<TARGET_FILE:ct_boot>
+        ${GAME_DIR}/test/replay ${GAME_DIR}/test/interp_ceilings.txt ${r})
+    list(APPEND ct_game_tests interp_share_${r})
+endforeach()
+
 # port: co-op (game/ct/coop.c, replay/coop_battle.txt): Gato's fight with
 # the girl in the party. With --coop her command menu ($7E95D5 = 1) takes
 # pad 2 only: pad 1's A presses and a pad 2 A held across the hand-off pick

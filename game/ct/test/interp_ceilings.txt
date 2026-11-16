@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2026 jerbanpls
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Interpreter-share ceilings (upstream issue #108), read by
+# test_interp_share.py. One line per replay in replay/:
+#   NAME FRAMES CEILING_PERCENT [ct_boot options...]
+# CEILING_PERCENT is the share of instructions run in the interpreter
+# (ct_boot --profile), measured and rounded up to 0.01. A run is
+# deterministic, so a rise is a real regression. Only ever LOWER a ceiling
+# (after a change that moves code to native); never raise one.
+leene_square 9210 8.26
+gato_battle 11000 7.14
+gato_win 13950 6.74
+soft_reset 9800 8.08
+world_map_save 10100 12.16
+coop_battle 14750 6.92 --coop
+coop_field 12820 7.54 --coop
+coop_mash 14500 6.99 --coop
+coop_split 12800 7.55 --coop --coop-split
