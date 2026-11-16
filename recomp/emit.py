@@ -391,6 +391,16 @@ def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
                 cond = [f'!ct_call_interp(cpu, t, 0x{back:06X}, 2)']
                 cond += [f'cpu->{r} != {int(v)}' for r, v in (('m', cst.m), ('x', cst.x))
                          if v is not None]
+                alts = fn.dyn_alts.get(i.key, [])
+                if alts and cst.m is not None and cst.x is not None:
+                    # the callee came back with other M/X: the continuation
+                    # decoded for that pair, else the interpreter
+                    sw = [f'if (cpu->m == {int(m)} && cpu->x == {int(x)}) '
+                          f'goto {label(i.next_addr, (m, x, False))};' for m, x in alts]
+                    return [_strict_rest(i), f'push16(cpu, 0x{ret:04X});'] + body + \
+                        [f'if ({cond[0]}) {{ ct_interp_rest(cpu, s0); return; }}',
+                         f'if (cpu->m != {int(cst.m)} || cpu->x != {int(cst.x)}) {{'] + sw + \
+                        ['ct_interp_rest(cpu, s0); return; }']
                 return [_strict_rest(i), f'push16(cpu, 0x{ret:04X});'] + body + \
                     [f'if ({" || ".join(cond)}) {{ ct_interp_rest(cpu, s0); return; }}']
         elif i.opcode in (0x6C, 0xDC) and i.key in fn.dyn_tables:
@@ -554,7 +564,11 @@ def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
             raise EmitError(f'${i.addr:06X}: {i.text()} (opcode ${i.opcode:02X}, '
                             f'width {w or "-"}) not implemented')
         body = t(i)
-        if i.key in fn.plp_interp:   # unknown M/X after the pull: the rest is interpreted
+        if i.key in fn.plp_interp:   # unknown M/X after the pull: native per M/X, else interpreted
+            nxt_addr, combos = fn.plp_interp[i.key]
+            for m, x in combos:
+                body.append(f'if (cpu->m == {int(m)} && cpu->x == {int(x)}) '
+                            f'goto {label(nxt_addr, (m, x, False))};')
             body += [f'cpu->PB = 0x{i.addr >> 16:02X};', f'cpu->PC = 0x{i.next_addr & 0xFFFF:04X};',
                      'ct_interp_rest(cpu, s0);', 'return;']
         elif i.mnemonic == 'PLP':
@@ -572,7 +586,7 @@ def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
                             f'goto {label(i.next_addr, k)};')
             body.append(f'ct_fatal("${i.addr:06X}: callee returned with m%d x%d", cpu->m, cpu->x);')
         elif i.key in fn.plp_interp:
-            pass
+            pass   # the run-time dispatch above ends every path
         elif i.mnemonic not in NO_FALLTHROUGH:
             succ = (i.next_addr,) + post
             if nxt is None or nxt.key != succ:

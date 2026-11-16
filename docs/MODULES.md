@@ -43,6 +43,28 @@ The script does five things:
 
 It took about 40 s on a Ryzen Z1 Extreme. `--native` tunes the code for the local CPU.
 
+## Code in RAM (overlays)
+
+A game that decompresses code into RAM is handled in four steps. `game/<id>/overlays.toml`
+lists each blob (source pointer, size, destination, FNV-1a hash and the entry points with
+their M/X) and never holds bytes; `tools/find_overlays.py` writes it from profiles of
+the replays. The build decompresses each blob from the user's ROM (`overlay_images.py`),
+checks the hash, and the translator decodes the entries from that image. Each compiled
+function carries the hash of its byte extent. At run time (`runtime/overlay.c`) a call to
+an entry runs the native code only while the RAM bytes still hash the same; otherwise the
+interpreter runs it. Code that patches itself is therefore always correct, and the
+interpreter is the defined exception for it. A stub the game builds in RAM
+byte by byte is an `[[extern]]` hook that reads the bytes at run time (`Wram_MvnStub` in
+the CT module).
+
+Entries that join a save/restore sequence in the middle, or calls through a table of
+unknown length, can come back with an M/X the decoder cannot know. The translator then
+decodes the continuation for each of the four M/X pairs that decode and the generated code
+picks one from the live flags (`Function.plp_interp` after a `PLP`, `Function.dyn_alts`
+after a `JSR (abs,X)`). For a call the extra pairs are only kept when they end the way the
+assumed pair does, because callers know one set of exits. Pairs that do not decode, or end
+differently, stay with the interpreter's dispatch.
+
 ## Game patches
 
 A game's generated code can't be edited by hand, so a game changes its behaviour through
