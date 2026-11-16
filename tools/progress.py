@@ -135,6 +135,10 @@ def main() -> int:
         banks[a >> 16] = banks.get(a >> 16, 0) + 1
 
     unresolved = load_unresolved()
+    notcode = funcs.load_notcode(os.path.join(GAME, 'notcode.toml'))
+    clash = {u['addr'] for u in unresolved} & {n['addr'] for n in notcode}
+    if clash:
+        raise SystemExit(f'progress: {len(clash)} address(es) both unresolved and not code')
     validated_by_bank: dict[int, int] = {}
     for fm in metas:
         b = fm.addr >> 16
@@ -154,6 +158,7 @@ def main() -> int:
            f'| Functions known total (validated + pending + unresolved) | {len(metas) + len(pending) + len(unresolved)} |',
            f'| Functions validated | {len(metas)} |',
            f'| Functions unresolved (pending sync) | {len(unresolved)} |',
+           f'| Labels that are not code (not counted as functions) | {len(notcode)} |',
            f'| Manual roots not yet emittable | {len(pending)} |',
            f'| Opcodes implemented | {len(ops)} / 256 |',
            f'| Opcodes used by recompiled routines | {len(used)} / 256 |',

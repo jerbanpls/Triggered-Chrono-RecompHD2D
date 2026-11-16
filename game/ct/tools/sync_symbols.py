@@ -104,6 +104,7 @@ from decode import DecodeError, State  # noqa: E402
 
 FUNCS_TOML = os.path.join(GAME, 'funcs.toml')
 UNRESOLVED_TOML = os.path.join(GAME, 'unresolved.toml')
+NOTCODE_TOML = os.path.join(GAME, 'notcode.toml')
 
 MNEMONICS = {m for m, _ in decode.OPCODES.values()}
 
@@ -421,8 +422,11 @@ class Result:
 
 
 def validate(rom: bytes, existing: list[funcs.FuncMeta], candidates: dict[int, Candidate],
-             module: str, funcs_path: str = FUNCS_TOML) -> Result:
+             module: str, funcs_path: str = FUNCS_TOML,
+             notcode: frozenset = frozenset()) -> Result:
     res = Result()
+    # classified as not code (notcode.toml): neither validated nor unresolved
+    candidates = {a: c for a, c in candidates.items() if a not in notcode}
     existing_by_addr = {fm.addr: fm for fm in existing}
 
     live: dict[int, Candidate] = {}
@@ -565,7 +569,8 @@ def carry_forward(auto: list[funcs.FuncMeta],
     return cands
 
 
-def sync(bank: int, module: str | None = None, funcs_path: str = FUNCS_TOML) -> Result:
+def sync(bank: int, module: str | None = None, funcs_path: str = FUNCS_TOML,
+         notcode_path: str = NOTCODE_TOML) -> Result:
     """Run the full sync for `bank` against `funcs_path` and return the
     result, without writing anything -- used by callers (and tests) that
     want to inspect or diff output themselves.
@@ -580,7 +585,8 @@ def sync(bank: int, module: str | None = None, funcs_path: str = FUNCS_TOML) -> 
     auto = [fm for fm in loaded if fm.addr in auto_addrs]
     candidates = carry_forward(auto, merge(bank))
     candidates = propagate(rom, existing, candidates)
-    res = validate(rom, existing, candidates, module, funcs_path)
+    notcode = frozenset(t['addr'] for t in funcs.load_notcode(notcode_path))
+    res = validate(rom, existing, candidates, module, funcs_path, notcode)
     kept = {fm.addr for fm in res.validated}
     for fm in auto:
         if fm.addr not in kept:
@@ -596,10 +602,11 @@ def main(argv: list[str]) -> int:
     p.add_argument('--dry-run', action='store_true')
     p.add_argument('--funcs-toml', default=FUNCS_TOML)
     p.add_argument('--unresolved-toml', default=UNRESOLVED_TOML)
+    p.add_argument('--notcode-toml', default=NOTCODE_TOML)
     a = p.parse_args(argv)
     bank = int(a.bank, 16)
     module = a.module or f'bank{bank:02x}'
-    result = sync(bank, module, a.funcs_toml)
+    result = sync(bank, module, a.funcs_toml, a.notcode_toml)
 
     for c, reason in result.conflicts:
         print(f'CONFLICT ${c.addr:06X} {c.name} ({c.src}): {reason}', file=sys.stderr)

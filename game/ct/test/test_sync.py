@@ -27,9 +27,10 @@ SYNC = os.path.join(GAME, 'tools', 'sync_symbols.py')
 BANK = 'C0'
 
 
-def run_sync(funcs_toml: str, unresolved_toml: str) -> None:
+def run_sync(funcs_toml: str, unresolved_toml: str, notcode_toml: str) -> None:
     subprocess.run(
-        [sys.executable, SYNC, BANK, '--funcs-toml', funcs_toml, '--unresolved-toml', unresolved_toml],
+        [sys.executable, SYNC, BANK, '--funcs-toml', funcs_toml, '--unresolved-toml', unresolved_toml,
+         '--notcode-toml', notcode_toml],
         check=True, cwd=REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
@@ -60,8 +61,9 @@ def main() -> int:
         for dst in (a_unres, b_unres):
             shutil.copy(unres_src, dst)
 
-        run_sync(a_funcs, a_unres)
-        run_sync(b_funcs, b_unres)
+        notcode = os.path.join(GAME, 'notcode.toml')
+        run_sync(a_funcs, a_unres, notcode)
+        run_sync(b_funcs, b_unres, notcode)
 
         lost = entries(funcs_src) - entries(a_funcs)
         if lost:
@@ -79,8 +81,16 @@ def main() -> int:
             print('FAIL: two independent syncs produced different unresolved.toml output')
             return 1
 
+        with open(notcode, 'rb') as f:
+            not_code = {t['addr'] for t in tomllib.load(f).get('notcode', [])}
+        with open(a_unres, 'rb') as f:
+            back = not_code & {u['addr'] for u in tomllib.load(f).get('unresolved', [])}
+        if back:
+            print(f'FAIL: sync listed {len(back)} not-code labels as unresolved')
+            return 1
+
         before_funcs, before_unres = a_funcs_text, a_unres_text
-        run_sync(a_funcs, a_unres)   # re-sync an already-synced copy
+        run_sync(a_funcs, a_unres, notcode)   # re-sync an already-synced copy
         if read(a_funcs) != before_funcs:
             print('FAIL: re-syncing an already-synced funcs.toml changed it (not idempotent)')
             return 1

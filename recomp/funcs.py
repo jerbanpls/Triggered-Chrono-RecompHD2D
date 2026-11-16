@@ -114,6 +114,38 @@ def load_exits(path: str) -> dict[tuple, tuple]:
     return out
 
 
+NOTCODE_KINDS = ('interior', 'data', 'sentinel', 'padding', 'text')
+
+
+def load_notcode(path: str) -> list[dict]:
+    """notcode.toml: labels from the symbol sources that are not function
+    entries, so the known-function accounting leaves them out.
+      interior  an instruction start inside a compiled routine, reached
+                only by that routine's own control flow (`in` names it);
+      data      a table or block of bytes read as data;
+      sentinel  an endless loop that is never meant to be entered;
+      padding / text  filler or character data.
+    Each entry carries `evidence`, a one-line reason. A missing file means
+    no entries."""
+    import os
+    if not os.path.isfile(path):
+        return []
+    with open(path, 'rb') as f:
+        data = tomllib.load(f)
+    out, seen = [], set()
+    for t in data.get('notcode', []):
+        for k in ('name', 'addr', 'kind', 'evidence'):
+            if k not in t:
+                raise DecodeError(f'notcode.toml: {t.get("name", "?")}: missing {k}')
+        if t['kind'] not in NOTCODE_KINDS:
+            raise DecodeError(f'notcode.toml: {t["name"]}: bad kind {t["kind"]!r}')
+        if t['addr'] in seen:
+            raise DecodeError(f'notcode.toml: duplicate address ${t["addr"]:06X}')
+        seen.add(t['addr'])
+        out.append(t)
+    return out
+
+
 def load(path: str) -> list[FuncMeta]:
     with open(path, 'rb') as f:
         data = tomllib.load(f)

@@ -122,7 +122,14 @@ def sweep(rom: bytes, blk: Block, states: dict[int, set], errors: list, notes: l
             if len(sizes) != 1:
                 errors.append(f'${addr:06X}: variants decode to different sizes {sorted(sizes)}')
         if st is None:
-            st = GAME_CFG.default_state(addr >> 16)
+            try:
+                st = GAME_CFG.default_state(addr >> 16)
+            except decode.DecodeError as ex:
+                # A bank with no entry_default (bank $C0 mixes M/X conventions)
+                # can only be swept where a funcs.toml routine supplies the
+                # state; elsewhere the block is left unswept, not guessed.
+                notes.append(f'block ${blk.org:06X}: not swept from ${addr:06X} ({ex})')
+                return
         try:
             i = decode.decode_insn(rom, addr, st)
         except decode.DecodeError as ex:
