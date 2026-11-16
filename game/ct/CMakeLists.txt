@@ -357,10 +357,16 @@ add_test(NAME native_coverage COMMAND ct_boot --frames 11000 --min-native 49
     --script ${GAME_DIR}/test/replay/gato_battle.txt)
 list(APPEND ct_game_tests native_coverage)
 
+# The field menu's seven screens (replay/menu_tour.txt), native == interpreter.
+add_test(NAME lockstep_menu_tour COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_SOURCE_DIR}/tools/lockstep.py $<TARGET_FILE:ct_boot> --frames 11450
+    --script ${GAME_DIR}/test/replay/menu_tour.txt)
+list(APPEND ct_game_tests lockstep_menu_tour)
+
 # Interpreter share per replay must not rise above its recorded ceiling
 # (upstream issue #108; test/interp_ceilings.txt, lower-only).
 foreach(r leene_square gato_battle gato_win soft_reset world_map_save
-          coop_battle coop_field coop_mash coop_split)
+          coop_battle coop_field coop_mash coop_split menu_tour)
     add_test(NAME interp_share_${r} COMMAND ${Python3_EXECUTABLE}
         ${GAME_DIR}/test/test_interp_share.py $<TARGET_FILE:ct_boot>
         ${GAME_DIR}/test/replay ${GAME_DIR}/test/interp_ceilings.txt ${r})

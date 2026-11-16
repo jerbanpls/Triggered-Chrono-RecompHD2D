@@ -17,3 +17,4 @@ coop_battle 14750 6.92 --coop
 coop_field 12820 7.54 --coop
 coop_mash 14500 6.99 --coop
 coop_split 12800 7.55 --coop --coop-split
+menu_tour 11450 18.24

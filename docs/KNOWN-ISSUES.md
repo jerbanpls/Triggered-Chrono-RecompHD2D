@@ -52,6 +52,16 @@ Frames are `ct_boot` frames (1-based) with the named replay script.
     sooner. The battle isn't short of CPU time. Its main loop finishes each frame's
     work by about line 55-75 and then waits at `$CD3E44`, so lag frames don't explain
     it.
+  - Lane L3 re-check (no network; neither the movie nor its video is in the checkout or the reference repos):
+    the Roly Rider desync cannot
+    be reproduced here and no cause was found. `tools/tas_convert.py` only
+    translates inputs (a pure per-frame mapping) and `tools/tas_resync.c` only
+    shifts inputs by whole frames, so neither can make a battle run slower; the
+    divergence is in emulated timing (the measurements above point at the
+    sound-upload handshake cost and the reference's audio state), not in the
+    tooling. No fix is justified without the movie and a reference trace. A next
+    session with the movie should run `tools/ref_compare.py` against Mesen 2 from
+    frame 13,400 first (the telepod load) before looking at the battle.
 
 ## Fixed
 
