@@ -11,6 +11,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'recomp'))
 import decode  # noqa: E402
+import emit  # noqa: E402
+import funcs  # noqa: E402
 
 fails = 0
 
@@ -103,6 +105,17 @@ check(list(fn.dyn_tables) and ('?', None, None) in fn.exit_states, 'JMP (abs,X):
 fn = decode.decode_function(rom_with(bytes([0x5C, 0x00, 0x00, 0xE5])), 0xE48000, m1x0, Dyn())
 check({k[0]: t for k, (t, _) in fn.interp_tails.items()} == {0xE48000: 0xE50000} and
       ('?', None, None) in fn.exit_states, 'JML to uncompiled code: interpreter tail')
+
+# JMP ($0050) / JML [$0050]: pointer read at run time, exits unknown
+for op, what in ((0x6C, 'JMP (abs)'), (0xDC, 'JML [abs]')):
+    fn = decode.decode_function(rom_with(bytes([op, 0x50, 0x00])), 0xE48000, m1x0, Dyn())
+    check(list(fn.dyn_tables) and ('?', None, None) in fn.exit_states, what + ': run-time dispatch')
+    fm = funcs.FuncMeta('T', 0xE48000, ('m1x0',), 0, None, None, 'bankE4')
+    src = '\n'.join(emit.emit_function(fm, fn))
+    want = ['read8(0x0050u)', 'cpu->PC = (uint16_t)t;', 'ct_tail_rest(cpu, s0);']
+    want += ['read8((uint16_t)(0x0050u + 2)) << 16', 'cpu->PB = (uint8_t)(t >> 16);'] if op == 0xDC \
+        else ['cpu->PB = 0xE4;']
+    check(all(w in src for w in want), what + ': emits bank-0 pointer read and interpreter dispatch')
 
 print(f"decode_calls: {'ok' if not fails else str(fails) + ' failed'}")
 sys.exit(1 if fails else 0)

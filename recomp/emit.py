@@ -230,7 +230,7 @@ NO_FALLTHROUGH = {'RTS', 'RTL', 'RTI', 'BRA', 'BRL', 'JMP', 'JML', 'STP', 'BRK',
 
 
 def implemented_opcodes() -> set[int]:
-    return {op for op, _ in TEMPLATES} | {0x20, 0x22, 0x4C, 0x5C, 0x7C, 0xFC}   # emit_function
+    return {op for op, _ in TEMPLATES} | {0x20, 0x22, 0x4C, 0x5C, 0x6C, 0x7C, 0xDC, 0xFC}   # emit_function
 
 
 _OVERLAY = ''   # set while emitting an overlay: names its WRAM functions
@@ -377,6 +377,21 @@ def emit_function(fm: funcs.FuncMeta, fn: decode.Function) -> list[str]:
                          if v is not None]
                 return [_strict_rest(i), f'push16(cpu, 0x{ret:04X});'] + body + \
                     [f'if ({" || ".join(cond)}) {{ ct_interp_rest(cpu, s0); return; }}']
+        elif i.opcode in (0x6C, 0xDC) and i.key in fn.dyn_tables:
+            def t(i):
+                # JMP (abs) / JML [abs]: the pointer is read from bank 0 with
+                # bus reads (wrapping in the bank), the target is run through
+                # the interpreter's dispatch (compiled targets still run native)
+                bank = i.addr >> 16
+                body = [_strict_rest(i),
+                        f'uint32_t t = read8(0x{i.operand:04X}u);',
+                        f't |= (uint32_t)read8((uint16_t)(0x{i.operand:04X}u + 1)) << 8;']
+                if i.opcode == 0xDC:
+                    body += [f't |= (uint32_t)read8((uint16_t)(0x{i.operand:04X}u + 2)) << 16;',
+                             'cpu->PB = (uint8_t)(t >> 16);']
+                else:
+                    body += [f'cpu->PB = 0x{bank:02X};']
+                return body + ['cpu->PC = (uint16_t)t;', 'ct_interp_rest(cpu, s0);', 'return;']
         elif i.opcode in (0x20, 0x22) and i.key in fn.interp_calls:
             target, cst = fn.interp_calls[i.key]
             long = i.opcode == 0x22

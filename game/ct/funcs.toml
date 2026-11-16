@@ -10919,3 +10919,133 @@ states = ["m1x0"]
 e = 0
 module = "bankcf"
 source = "profile"
+
+# ---- discovered by tools/discover.py (entry state from call sites) ----
+
+[[func]]
+name = "Menu_RunWinSlots"
+addr = 0xC2051D
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Menu_CallSlotVector"
+addr = 0xC20553
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Sub_C21807"
+addr = 0xC21807
+states = ["m0x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Menu_CallVia5B"
+addr = 0xC21819
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "MenuTask_Sleep"
+addr = 0xC2821E
+states = ["m0x0", "m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "MenuTask_SleepFrames"
+addr = 0xC2822B
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Menu_FadeOutBrightness"
+addr = 0xC283CA
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Menu_FadeBrightnessStep"
+addr = 0xC283D0
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Sub_C2EF48"
+addr = 0xC2EF48
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Menu_DrawString"
+addr = 0xC2EF65
+states = ["m1x0", "m0x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Menu_DrawStringLoop"
+addr = 0xC2EF7E
+states = ["m0x0", "m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Menu_TextControlCode"
+addr = 0xC2EFBE
+states = ["m1x0"]
+e = 0
+module = "bankc2"
+source = "profile"
+
+[[func]]
+name = "Sub_C30BA6"
+addr = 0xC30BA6
+states = ["m0x0"]
+e = 0
+module = "bankc3"
+source = "profile"
+
+[[func]]
+name = "Sub_C30BAA"
+addr = 0xC30BAA
+states = ["m0x0"]
+e = 0
+module = "bankc3"
+source = "profile"
+
+[[func]]
+name = "Sub_C30BAB"
+addr = 0xC30BAB
+states = ["m0x0"]
+e = 0
+module = "bankc3"
+source = "profile"
+
+[[func]]
+name = "Sub_C30BC4"
+addr = 0xC30BC4
+states = ["m0x0"]
+e = 0
+module = "bankc3"
+source = "profile"

@@ -779,6 +779,12 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
                 nxt = _continue(fn, ikey, i, nxt, exits, work)
                 if nxt is None:
                     break
+            elif mn in ('JMP', 'JML') and i.mode in ('abs_ind', 'abs_ind_long'):
+                # JMP (abs) / JML [abs]: the pointer lives in bank 0 and is
+                # read at run time; the target goes through the dispatcher
+                fn.dyn_tables[ikey] = State(nxt.m, nxt.x, nxt.e)
+                fn.exit_states.add(('?', None, None))   # whatever the target does
+                break
             elif mn == 'WDM':
                 raise DecodeError(f'${addr:06X}: WDM: not code (data decoded as code?)')
             elif mn in ('BRK', 'COP', 'STP', 'WAI'):
