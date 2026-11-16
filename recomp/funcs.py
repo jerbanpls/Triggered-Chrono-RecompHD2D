@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 import tomllib
 from dataclasses import dataclass
 
@@ -73,6 +74,43 @@ def load_jumptables(path: str) -> dict[int, int]:
         if 'site' not in t or 'count' not in t or t['count'] < 1:
             raise DecodeError(f'funcs.toml: bad jumptable {t}')
         out[t['site']] = t['count']
+    return out
+
+
+def load_handoffs(path: str) -> set[int]:
+    """Sites (24-bit address of a JML, or a JMP (abs,X) through a table of
+    unknown length) whose jump never returns to the routine's caller: the
+    target restarts the machine or switches stacks for good. The path ends
+    there instead of leaving the routine's exit M/X unknown."""
+    with open(path, 'rb') as f:
+        data = tomllib.load(f)
+    out = set()
+    for t in data.get('handoff', []):
+        if 'site' not in t:
+            raise DecodeError(f'funcs.toml: bad handoff {t}')
+        out.add(t['site'])
+    return out
+
+
+def load_exits(path: str) -> dict[tuple, tuple]:
+    """(entry address, entry state tag) -> (return mnemonic, m, x): the exit
+    of a routine whose jumps hand the caller's frame to code the decoder
+    can't follow (a PHP at entry, a PLP in the code it jumps to): the P the
+    caller gets back is the one saved at entry, so M/X equal the entry's
+    unless the entry says otherwise."""
+    with open(path, 'rb') as f:
+        data = tomllib.load(f)
+    out = {}
+    for t in data.get('exit', []):
+        for k in ('addr', 'state', 'returns', 'exit_state'):
+            if k not in t:
+                raise DecodeError(f'funcs.toml: exit {t}: missing {k}')
+        if t['returns'] not in ('RTS', 'RTL'):
+            raise DecodeError(f'funcs.toml: exit {t}: bad returns')
+        m = re.fullmatch(r'm([01])x([01])', t['exit_state'])
+        if not m:
+            raise DecodeError(f'funcs.toml: exit {t}: bad exit_state')
+        out[(t['addr'], t['state'])] = (t['returns'], bool(int(m[1])), bool(int(m[2])))
     return out
 
 
@@ -149,6 +187,8 @@ class Registry:
         self.by_addr = {fm.addr: fm for fm in metas}
         self.jumptables = load_jumptables(funcs_path) if jumptables is None else jumptables
         self.externs = load_externs(funcs_path)
+        self.handoffs = load_handoffs(funcs_path)
+        self.exits = load_exits(funcs_path)
         self.cache: dict[tuple, decode.Function] = {}
         self.active: set[tuple] = set()
         self.assume: dict[tuple, tuple] = {}   # recursive key -> assumed exit (m, x)
@@ -161,7 +201,7 @@ class Registry:
             raise NeedAssumption(key)
         self.active.add(key)
         try:
-            fn = decode.decode_function(self.rom, addr, st, self)
+            fn = self._declared(decode.decode_function(self.rom, addr, st, self), st)
         except NeedAssumption as ex:
             if ex.key != key:
                 raise
@@ -169,6 +209,15 @@ class Registry:
         finally:
             self.active.discard(key)
         self.cache[key] = fn
+        return fn
+
+    def _declared(self, fn: decode.Function, st: State) -> decode.Function:
+        """Apply an [[exit]] declaration: it replaces the exits whose M/X the
+        decoder couldn't follow."""
+        decl = self.exits.get((fn.entry, st.tag()))
+        if decl is not None:
+            fn.exit_states = {e for e in fn.exit_states if e[1] is not None and e[2] is not None}
+            fn.exit_states.add(decl)
         return fn
 
     def _fixpoint(self, key: tuple, addr: int, st: State) -> decode.Function:
@@ -179,7 +228,7 @@ class Registry:
         try:
             for _ in range(16):
                 before = set(self.cache)
-                fn = decode.decode_function(self.rom, addr, st, self)
+                fn = self._declared(decode.decode_function(self.rom, addr, st, self), st)
                 if fn.exit_states == self.assume[key]:
                     return fn
                 self.assume[key] = set(fn.exit_states)

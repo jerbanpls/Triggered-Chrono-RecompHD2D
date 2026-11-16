@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """discover.py's discovery loop on a synthetic bank (no game ROM): A and B
 call each other (a cycle), A calls N (not registered) and U (registered,
-but it ends in a JML to code nobody registered, so its exit M/X is
-unknown and its caller runs it interpreted). The loop must settle in two
-passes: N becomes a candidate, U is reported as compiled but called
-interpreted, and nothing is re-added forever (the loop used to count U's
-state, already registered, as new on every pass)."""
+but it ends in a JMP through a table of unknown length, so its exit M/X is
+unknown and its caller runs it interpreted), and V (registered, it ends in a
+JML to M, which nobody registered: M becomes a candidate too). The loop must
+settle in a few passes: N and M become candidates, U is reported as compiled
+but called interpreted, and nothing is re-added forever (the loop used to
+count U's state, already registered, as new on every pass)."""
 import os
 import sys
 import tempfile
@@ -16,6 +17,7 @@ import discover  # noqa: E402
 import funcs  # noqa: E402  (discover put recomp/ on the path)
 
 A, B, U, N = 0xC01000, 0xC01020, 0xC01040, 0xC01060
+V, M = 0xC01080, 0xC010A0
 
 
 def w(a: int) -> bytes:
@@ -25,15 +27,17 @@ def w(a: int) -> bytes:
 def main() -> int:
     rom = bytearray(0x10000)
     code = {
-        A: b'\x20' + w(B) + b'\x20' + w(N) + b'\x20' + w(U) + b'\x60',   # JSR B, N, U / RTS
+        A: b'\x20' + w(B) + b'\x20' + w(N) + b'\x20' + w(U) + b'\x20' + w(V) + b'\x60',   # JSR B, N, U, V / RTS
         B: b'\xA5\x10\xF0\x03\x20' + w(A) + b'\x60',   # LDA $10 / BEQ +3 / JSR A / RTS
-        U: b'\x5C\x00\x90\xC0',                        # JML $C09000
+        U: b'\x7C\x00\x90',                            # JMP ($9000,X): length unknown
+        V: b'\x5C' + w(M) + b'\xC0',                    # JML M
+        M: b'\x60',                                    # RTS
         N: b'\x60',                                    # RTS
     }
     for a, c in code.items():
         rom[a & 0xFFFF:(a & 0xFFFF) + len(c)] = c
     metas = [funcs.FuncMeta(n, a, ('m1x0',), 0, None, None, 'bankc0')
-             for n, a in (('A', A), ('B', B), ('U', U))]
+             for n, a in (('A', A), ('B', B), ('U', U), ('V', V))]
     discover.MAX_PASSES = 5   # the old loop never settled: it would stop here
     fails = 0
     with tempfile.TemporaryDirectory() as tmp:
@@ -43,10 +47,10 @@ def main() -> int:
         passes = []
         discover.log = lambda msg: passes.append(msg)
         _, interp = discover.close_graph(bytes(rom), metas, cands, add_states, failures, path,
-                                         {}, {'A', 'B', 'U'}, 200)
+                                         {}, {'A', 'B', 'U', 'V'}, 200)
     checks = [
         ('two passes', len(passes), 2),
-        ('N discovered in m1x0', {a: fm.states for a, fm in cands.items()}, {N: ('m1x0',)}),
+        ('N and M discovered in m1x0', {a: fm.states for a, fm in cands.items()}, {N: ('m1x0',), M: ('m1x0',)}),
         ('U compiled but called interpreted', interp, {('U', 'm1x0'): 1}),
         ('no states added', add_states, {}),
         ('no failures', failures, {}),

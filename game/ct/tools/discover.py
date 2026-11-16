@@ -120,6 +120,17 @@ def close_graph(rom, metas, cands, add_states, failures, funcs_path, names, used
                         known = reg.by_addr.get(target)
                         k = (target, cst.tag(), known.name if known else None)
                         missing[k] = missing.get(k, 0) + 1
+                    # a JML, or a table case, run interpreted: the target is
+                    # an entry too, and its exit M/X feeds the caller's
+                    tail_sites = list(fn.interp_tails.items()) + [
+                        (key, (tg, fn.tables[key][1])) for key, tgs in fn.table_interp.items()
+                        for tg in sorted(tgs)]
+                    for key, (target, cst) in tail_sites:
+                        if key in guessed:
+                            continue
+                        known = reg.by_addr.get(target)
+                        k = (target, cst.tag(), known.name if known else None)
+                        missing.setdefault(k, 0)
                 except funcs.MissingTarget as ex:
                     k = (ex.target, ex.state.tag(), ex.name)
                     missing[k] = missing.get(k, 0) + 1
@@ -148,6 +159,8 @@ def close_graph(rom, metas, cands, add_states, failures, funcs_path, names, used
                 continue
             if len(cands) >= limit:
                 continue
+            if decode.snes_to_file(target) is None:
+                continue   # code in RAM (an overlay, a stub): nothing to compile from the ROM
             name = names.get(target, f'Sub_{target:06X}')
             if name in used_names:
                 name = f'{name}_{target:06X}'

@@ -694,7 +694,8 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
                 missing = getattr(resolve, 'missing', None)
                 if missing is not None and missing(i.operand, cst, 'JML'):
                     fn.interp_tails[ikey] = (i.operand, cst)
-                    fn.exit_states.add(('?', None, None))
+                    if addr not in getattr(resolve, 'handoffs', ()):   # [[handoff]]: no return
+                        fn.exit_states.add(('?', None, None))
                     break
                 fn.tails[ikey] = (i.operand, cst)
                 fn.exit_states |= resolve.tail_required(addr, i.operand, cst)
@@ -742,7 +743,8 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
                         i.addr not in getattr(resolve, 'jumptables', {i.addr: 0}):
                     fn.dyn_tables[ikey] = cst
                     if mn == 'JMP':
-                        fn.exit_states.add(('?', None, None))   # whatever the target does
+                        if addr not in getattr(resolve, 'handoffs', ()):   # [[handoff]]: no return
+                            fn.exit_states.add(('?', None, None))   # whatever the target does
                         break
                     nxt = _continue(fn, ikey, i, nxt, {(nxt.m, nxt.x)}, work)
                     addr, cur = i.next_addr, nxt
