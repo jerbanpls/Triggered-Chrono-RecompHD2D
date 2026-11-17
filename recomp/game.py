@@ -29,6 +29,10 @@ class Game:
     def unresolved_toml(self) -> str:
         return os.path.join(self.dir, 'unresolved.toml')
 
+    @property
+    def notcode_toml(self) -> str:
+        return os.path.join(self.dir, 'notcode.toml')
+
     def default_state(self, bank: int) -> State:
         """Entry state assumed for a routine in `bank` with none known."""
         for lo, hi, st in self.entry_defaults:

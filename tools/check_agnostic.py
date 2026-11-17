@@ -28,7 +28,8 @@ def game_terms(root: str) -> tuple[set[str], set[int], set[str]]:
     gdir = os.path.join(root, 'game')
     for g in sorted(os.listdir(gdir)) if os.path.isdir(gdir) else []:
         base = os.path.join(gdir, g)
-        for fname, key in (('funcs.toml', 'func'), ('unresolved.toml', 'unresolved')):
+        for fname, key in (('funcs.toml', 'func'), ('unresolved.toml', 'unresolved'),
+                           ('notcode.toml', 'notcode')):
             path = os.path.join(base, fname)
             if not os.path.isfile(path):
                 continue

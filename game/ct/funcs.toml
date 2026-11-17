@@ -7306,6 +7306,13 @@ e = 0
 module = "bankc0"
 source = "profile"
 
+# ScreenEffect_StateTable: index ($0139 - 1) * 2, 16 words filling $C021EE-$C0220D
+# exactly (the first handler starts at $C0220E). The call site runs m1x0 (the
+# routine's only entry state, no REP/SEP before the JSR).
+[[jumptable]]
+site = 0xC021EA
+count = 16
+
 [[func]]
 name = "Dialog_UploadTextTileRow"
 addr = 0xC06ECB
@@ -15270,3 +15277,186 @@ states = ["m1x0"]
 e = 0
 module = "bankc2"
 source = "profile"
+
+# ---- discovered by tools/discover.py (entry state from call sites) ----
+
+[[func]]
+name = "Loc_C0220E"
+addr = 0xC0220E
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C02269"
+addr = 0xC02269
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C022D8"
+addr = 0xC022D8
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "_C0L2329"
+addr = 0xC02329
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C0232A"
+addr = 0xC0232A
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C0238A"
+addr = 0xC0238A
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "_C0L23E2"
+addr = 0xC023E2
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C02409"
+addr = 0xC02409
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C02514"
+addr = 0xC02514
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C02589"
+addr = 0xC02589
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C0260E"
+addr = 0xC0260E
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "Loc_C0264F"
+addr = 0xC0264F
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "ScreenFx_RequestVector"
+addr = 0xC30008
+states = ["m1x0"]
+e = 0
+module = "bankc3"
+
+[[func]]
+name = "ScreenFx_TickVector"
+addr = 0xC3000E
+states = ["m1x0"]
+e = 0
+module = "bankc3"
+
+[[func]]
+name = "ScreenFx_Vector3"
+addr = 0xC30011
+states = ["m1x0"]
+e = 0
+module = "bankc3"
+
+[[func]]
+name = "ScreenFx_FillLineTable"
+addr = 0xC301C6
+states = ["m0x0"]
+e = 0
+module = "bankc3"
+
+[[func]]
+name = "ScreenFx_FillLineTableAtX"
+addr = 0xC301CA
+states = ["m0x0"]
+e = 0
+module = "bankc3"
+
+[[func]]
+name = "ScreenFx_MixRandom"
+addr = 0xC302DD
+states = ["m1x0"]
+e = 0
+module = "bankc3"
+
+[[func]]
+name = "Audio_ServiceExit"
+addr = 0xC70192
+states = ["m1x0"]
+e = 0
+module = "bankc7"
+
+[[func]]
+name = "Audio_PlaySongCmd"
+addr = 0xC701A1
+states = ["m1x0"]
+e = 0
+module = "bankc7"
+
+[[func]]
+name = "Audio_SendPlaySongCmd"
+addr = 0xC70A39
+states = ["m1x0"]
+e = 0
+module = "bankc7"
+
+[[func]]
+name = "BattleCF_ExitBattle"
+addr = 0xCFFBE5
+states = ["m1x0"]
+e = 0
+module = "bankcf"
+
+# JSR from Loc_C0264F ($C026BA, $C026D1, $C026E4), all m1x0 straight from the
+# routine's entry (no earlier callee changes M/X); discover.py skips these
+# sites as assumed-state calls, so it is registered by hand.
+[[func]]
+name = "Loc_C02725"
+addr = 0xC02725
+states = ["m1x0"]
+e = 0
+module = "bankc0"
+
+# Native NMI ($C0FFEA) and IRQ ($C0FFEE) vector stubs: one JML into WRAM
+# ($000500 / $000504), which does not look at P, so every entry M/X is valid;
+# interrupts keep the interrupted code's M/X, which is unknown here.
+[[func]]
+name = "Jumps7E0500Memory"
+addr = 0xC0FF10
+states = ["m1x0", "m0x0", "m1x1", "m0x1"]
+e = 0
+module = "bankc0"
+
+[[func]]
+name = "CODE_C0FF14"
+addr = 0xC0FF14
+states = ["m1x0", "m0x0", "m1x1", "m0x1"]
+e = 0
+module = "bankc0"

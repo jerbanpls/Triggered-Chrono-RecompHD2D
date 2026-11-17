@@ -747,10 +747,10 @@ without `--hd2d` to play with the original look, which works on any graphics dri
 
 **Steam Deck, ROG Ally and other handhelds.** Add the AppImage to Steam as a non-Steam
 game; for the Flatpak, add it with Steam's "Add a Non-Steam Game" and pick
-**CT Recomp**. In Game Mode HD-2D is on by default; for the original look, add
-`--no-hd2d` to the shortcut's launch options (for the Flatpak shortcut, at the end of
-the existing launch options).
-- In Game Mode (gamescope) the game starts fullscreen, with HD-2D on and no mouse
+**CT Recomp**. The game starts with the original look; for HD-2D, turn it on in the menu
+(Look tab, renderer; it is remembered) or add `--hd2d` to the shortcut's launch options
+(for the Flatpak shortcut, at the end of the existing launch options).
+- In Game Mode (gamescope) the game starts fullscreen, with no mouse
   cursor. The full guide is [HANDHELD.md](HANDHELD.md).
 - Use R3 and L3 for the look and the picture shape, since handhelds lack F-keys.
 - Use a Steam Input layout that sends gamepad buttons, not a keyboard or desktop layout.

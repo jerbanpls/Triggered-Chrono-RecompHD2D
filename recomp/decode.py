@@ -629,9 +629,15 @@ class Function:
     # compiled for the state, or exits unknown); the others stay compiled
     table_interp: dict = field(default_factory=dict)
     # PLP whose M/X result is unknown (the pulled byte was pushed before
-    # entry, or the stack pointer was reloaded): key -> next address. The
-    # pull is done in C and the rest runs through the interpreter's dispatch.
+    # entry, or the stack pointer was reloaded): key -> (next address,
+    # [(m, x)] continuations that decode). The pull is done in C, then the
+    # actual M/X pick the native continuation; any other combination runs
+    # through the interpreter's dispatch (as does everything, when none decodes).
     plp_interp: dict = field(default_factory=dict)
+    # JSR (abs,X) through a table of unknown length: the callee may come
+    # back with other M/X than it was called with. key -> [(m, x)] besides
+    # the assumed pair whose continuation decodes; picked at run time.
+    dyn_alts: dict = field(default_factory=dict)
 
     @property
     def size(self) -> int:
@@ -663,6 +669,31 @@ def _continue(fn: Function, ikey: tuple, i: Insn, nxt: State, exits: set, work: 
     return states[0]
 
 
+def _plp_combos(rom, addr: int, nxt: State, resolve) -> list:
+    """The M/X combinations after a PLP of unknown flags whose continuation
+    decodes: [((m, x), exit states)]. A combination that can't decode (a path
+    that makes no sense in that width) stays with the interpreter."""
+    global _probing
+    if _probing:   # inside a probe a nested PLP is not expanded (a loop would recurse)
+        return []
+    out = []
+    _probing = True
+    try:
+        for m in (False, True):
+            for x in (False, True):
+                try:
+                    sub = decode_function(rom, addr, State(m, x, False, nxt.stack, nxt.stack_lost), resolve)
+                except DecodeError:
+                    continue
+                out.append(((m, x), set(sub.exit_states)))
+    finally:
+        _probing = False
+    return out
+
+
+_probing = False
+
+
 def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function:
     """Decode all instructions reachable from entry without leaving the
     function. In-bank branches are followed. JSR abs requires resolve:
@@ -689,8 +720,13 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
                 fn.exit_states.add((mn, nxt.m, nxt.x))
                 break
             if mn == 'PLP' and not nxt.e and (nxt.m is None or nxt.x is None):
-                fn.plp_interp[ikey] = i.next_addr
-                fn.exit_states.add(('?', None, None))
+                combos = _plp_combos(rom, i.next_addr, nxt, resolve)
+                fn.plp_interp[ikey] = (i.next_addr, [c[0] for c in combos])
+                if len(combos) < 4:
+                    fn.exit_states.add(('?', None, None))   # the others run interpreted
+                for (m, x), exits in combos:
+                    fn.exit_states |= exits
+                    work.append((i.next_addr, State(m, x, False, nxt.stack, nxt.stack_lost)))
                 break
             if mn in BRANCHES:
                 work.append((i.branch_target(), nxt))
@@ -757,6 +793,17 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
                             fn.exit_states.add(('?', None, None))   # whatever the target does
                         break
                     nxt = _continue(fn, ikey, i, nxt, {(nxt.m, nxt.x)}, work)
+                    if not nxt.e:
+                        # only pairs whose continuation ends the way the assumed one
+                        # does (the callers know no other exit)
+                        combos = dict(_plp_combos(rom, i.next_addr, nxt, resolve))
+                        base = combos.get((nxt.m, nxt.x))
+                        alts = [(c, e) for c, e in combos.items()
+                                if c != (nxt.m, nxt.x) and base is not None and e <= base]
+                        fn.dyn_alts[ikey] = [c[0] for c in alts]
+                        for (m, x), exits in alts:
+                            fn.exit_states |= exits
+                            work.append((i.next_addr, State(m, x, False, nxt.stack, nxt.stack_lost)))
                     addr, cur = i.next_addr, nxt
                     continue
                 targets = resolve.table_targets(i)

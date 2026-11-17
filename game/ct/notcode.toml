@@ -1,0 +1,1828 @@
+# Labels from the symbol sources (dscotton, ChronoRET) that are not function
+# entries, so tools/progress.py leaves them out of the known-function count and
+# tools/sync_symbols.py does not list them as unresolved. Kinds: interior,
+# data, sentinel, padding, text (recomp/funcs.py load_notcode). test_notcode.py
+# checks every `interior` entry is an instruction start of a compiled routine
+# and that no entry is also a registered function or unresolved.
+#
+# interior: the label sits on an instruction the listed routine (`in`) already
+# decodes and compiles by following its own branches; no JSR/JSL/JMP site or
+# table outside that routine targets it (a call from compiled code would have
+# made it an entry in funcs.toml). Nothing is added to compile.
+
+[[notcode]]
+name = "UNREACH_C0027E"
+addr = 0xC0027E
+kind = "interior"
+in = "Field_PrepareBattleEntry"
+evidence = "instruction start inside compiled Field_PrepareBattleEntry; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C002AF"
+addr = 0xC002AF
+kind = "interior"
+in = "Scene_Unk0283"
+evidence = "instruction start inside compiled Scene_Unk0283; reached by its control flow"
+
+[[notcode]]
+name = "Field_ResumeCommonReload"
+addr = 0xC00304
+kind = "interior"
+in = "Scene_Unk0283"
+evidence = "instruction start inside compiled Scene_Unk0283; reached by its control flow"
+
+[[notcode]]
+name = "Field_ExportPpuStateTo2C56"
+addr = 0xC0066D
+kind = "interior"
+in = "Field_ExportBattleHandoffData"
+evidence = "instruction start inside compiled Field_ExportBattleHandoffData; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C00CCE"
+addr = 0xC00CCE
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "Event_ProcessPendingMenuRequest"
+addr = 0xC00CF0
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "Event_LaunchPendingMenuRequest"
+addr = 0xC00D09
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "Field_DispatchTileSwapTrigger"
+addr = 0xC00D3E
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "ModeE6_Handler"
+addr = 0xC00D78
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "ModeEC_Handler"
+addr = 0xC00E5F
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "ModeEE_Handler"
+addr = 0xC01014
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "ModeFA_Handler"
+addr = 0xC011C9
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "ModeFC_Handler"
+addr = 0xC01454
+kind = "interior"
+in = "Sub_0C76"
+evidence = "instruction start inside compiled Sub_0C76; reached by its control flow"
+
+[[notcode]]
+name = "Field_ProcessTransitionRequest"
+addr = 0xC01770
+kind = "interior"
+in = "DefaultHandler"
+evidence = "instruction start inside compiled DefaultHandler; reached by its control flow"
+
+[[notcode]]
+name = "Field_RedrawLayer3IfSelected"
+addr = 0xC01862
+kind = "interior"
+in = "DefaultHandler"
+evidence = "instruction start inside compiled DefaultHandler; reached by its control flow"
+
+[[notcode]]
+name = "Field_LaunchBattle"
+addr = 0xC0188C
+kind = "interior"
+in = "DefaultHandler"
+evidence = "instruction start inside compiled DefaultHandler; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C018CE"
+addr = 0xC018CE
+kind = "interior"
+in = "DefaultHandler"
+evidence = "instruction start inside compiled DefaultHandler; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0193E"
+addr = 0xC0193E
+kind = "interior"
+in = "Field_PauseAndMenuInput"
+evidence = "instruction start inside compiled Field_PauseAndMenuInput; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C019A7"
+addr = 0xC019A7
+kind = "interior"
+in = "Field_FadeToBankC2Mode5"
+evidence = "instruction start inside compiled Field_FadeToBankC2Mode5; reached by its control flow"
+
+[[notcode]]
+name = "Field_RunBankC2Mode5"
+addr = 0xC019C7
+kind = "interior"
+in = "Field_FadeToBankC2Mode5"
+evidence = "instruction start inside compiled Field_FadeToBankC2Mode5; reached by its control flow"
+
+[[notcode]]
+name = "Party_ReadActiveSlots"
+addr = 0xC01A5D
+kind = "interior"
+in = "Party_ReinitIfChanged"
+evidence = "instruction start inside compiled Party_ReinitIfChanged; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C01B22"
+addr = 0xC01B22
+kind = "interior"
+in = "Sub_1ADF"
+evidence = "instruction start inside compiled Sub_1ADF; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C01B25"
+addr = 0xC01B25
+kind = "interior"
+in = "Sub_1ADF"
+evidence = "instruction start inside compiled Sub_1ADF; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C01B32"
+addr = 0xC01B32
+kind = "interior"
+in = "Sub_1ADF"
+evidence = "instruction start inside compiled Sub_1ADF; reached by its control flow"
+
+[[notcode]]
+name = "MusicCueDispatch"
+addr = 0xC01BAB
+kind = "interior"
+in = "Field_EntryVec08_StartLocationSong"
+evidence = "instruction start inside compiled Field_EntryVec08_StartLocationSong; reached by its control flow"
+
+[[notcode]]
+name = "Field_RestoreMusicState_Entry"
+addr = 0xC01BE6
+kind = "interior"
+in = "Field_EntryVec0B_RestoreAudioState"
+evidence = "instruction start inside compiled Field_EntryVec0B_RestoreAudioState; reached by its control flow"
+
+[[notcode]]
+name = "Field_RestoreMusic_PlaySong26"
+addr = 0xC01C90
+kind = "interior"
+in = "Field_EntryVec0B_RestoreAudioState"
+evidence = "instruction start inside compiled Field_EntryVec0B_RestoreAudioState; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C01DA7"
+addr = 0xC01DA7
+kind = "interior"
+in = "Sub_C01D5E"
+evidence = "instruction start inside compiled Sub_C01D5E; reached by its control flow"
+
+[[notcode]]
+name = "Player_TryOpenTreasureChest"
+addr = 0xC01DF4
+kind = "interior"
+in = "Player_TryInteract"
+evidence = "instruction start inside compiled Player_TryInteract; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C01E09"
+addr = 0xC01E09
+kind = "interior"
+in = "Player_TryInteract"
+evidence = "instruction start inside compiled Player_TryInteract; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C01EDE"
+addr = 0xC01EDE
+kind = "interior"
+in = "Sub_C01E9A"
+evidence = "instruction start inside compiled Sub_C01E9A; reached by its control flow"
+
+[[notcode]]
+name = "Dialog_OpenSystemMessage"
+addr = 0xC01F0E
+kind = "interior"
+in = "Player_TryInteract"
+evidence = "instruction start inside compiled Player_TryInteract; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C02081"
+addr = 0xC02081
+kind = "interior"
+in = "Field_Unk1F87"
+evidence = "instruction start inside compiled Field_Unk1F87; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0208B"
+addr = 0xC0208B
+kind = "interior"
+in = "Field_Unk1F87"
+evidence = "instruction start inside compiled Field_Unk1F87; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0212B"
+addr = 0xC0212B
+kind = "interior"
+in = "Dialog_HandleRenderResult"
+evidence = "instruction start inside compiled Dialog_HandleRenderResult; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C021A3"
+addr = 0xC021A3
+kind = "interior"
+in = "Dialog_HandleRenderResult"
+evidence = "instruction start inside compiled Dialog_HandleRenderResult; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C021C2"
+addr = 0xC021C2
+kind = "interior"
+in = "Dialog_HandleRenderResult"
+evidence = "instruction start inside compiled Dialog_HandleRenderResult; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C02307"
+addr = 0xC02307
+kind = "interior"
+in = "Loc_C022D8"
+evidence = "instruction start inside compiled Loc_C022D8; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0277E"
+addr = 0xC0277E
+kind = "interior"
+in = "Field_ServiceUnk54"
+evidence = "instruction start inside compiled Field_ServiceUnk54; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C028D6"
+addr = 0xC028D6
+kind = "interior"
+in = "Field_QueueOpenedTileOffset"
+evidence = "instruction start inside compiled Field_QueueOpenedTileOffset; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C02918"
+addr = 0xC02918
+kind = "interior"
+in = "Field_AdvanceTileGroupAt"
+evidence = "instruction start inside compiled Field_AdvanceTileGroupAt; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0291C"
+addr = 0xC0291C
+kind = "interior"
+in = "Field_AdvanceTileGroupAt"
+evidence = "instruction start inside compiled Field_AdvanceTileGroupAt; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C02933"
+addr = 0xC02933
+kind = "interior"
+in = "Field_AdvanceTileGroupAt"
+evidence = "instruction start inside compiled Field_AdvanceTileGroupAt; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C02958"
+addr = 0xC02958
+kind = "interior"
+in = "Field_AdvanceTileGroupAt"
+evidence = "instruction start inside compiled Field_AdvanceTileGroupAt; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C029BA"
+addr = 0xC029BA
+kind = "interior"
+in = "Field_AdvanceTileGroupAt"
+evidence = "instruction start inside compiled Field_AdvanceTileGroupAt; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C02A32"
+addr = 0xC02A32
+kind = "interior"
+in = "Field_Unk29F7"
+evidence = "instruction start inside compiled Field_Unk29F7; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C02C8C"
+addr = 0xC02C8C
+kind = "interior"
+in = "Field_EntryVec02_UpdateBgAutoScroll"
+evidence = "instruction start inside compiled Field_EntryVec02_UpdateBgAutoScroll; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C02CDA"
+addr = 0xC02CDA
+kind = "interior"
+in = "Field_EntryVec02_UpdateBgAutoScroll"
+evidence = "instruction start inside compiled Field_EntryVec02_UpdateBgAutoScroll; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C02D0B"
+addr = 0xC02D0B
+kind = "interior"
+in = "Field_EntryVec02_UpdateBgAutoScroll"
+evidence = "instruction start inside compiled Field_EntryVec02_UpdateBgAutoScroll; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C02DC5"
+addr = 0xC02DC5
+kind = "interior"
+in = "Field_EntryVec02_UpdateBgAutoScroll"
+evidence = "instruction start inside compiled Field_EntryVec02_UpdateBgAutoScroll; reached by its control flow"
+
+[[notcode]]
+name = "ColorCrashEndsInfiniteLoop_2E65"
+addr = 0xC02E65
+kind = "interior"
+in = "EventCmd_LoadEnemy"
+evidence = "instruction start inside compiled EventCmd_LoadEnemy; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C030A7"
+addr = 0xC030A7
+kind = "interior"
+in = "Obj_StepAlignToTileCenter"
+evidence = "instruction start inside compiled Obj_StepAlignToTileCenter; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C031BB"
+addr = 0xC031BB
+kind = "interior"
+in = "Obj_TryPushBlocker"
+evidence = "instruction start inside compiled Obj_TryPushBlocker; reached by its control flow"
+
+[[notcode]]
+name = "Dialog_OpenDecisionBox"
+addr = 0xC03674
+kind = "interior"
+in = "EventCmd_OpC0"
+evidence = "instruction start inside compiled EventCmd_OpC0; reached by its control flow"
+
+[[notcode]]
+name = "EventCommandCC_3845"
+addr = 0xC03845
+kind = "interior"
+in = "EventCmd_IfGoldGte"
+evidence = "instruction start inside compiled EventCmd_IfGoldGte; reached by its control flow"
+
+[[notcode]]
+name = "EventCommandCF_38A8"
+addr = 0xC038A8
+kind = "interior"
+in = "EventCmd_PartyReserveCheck"
+evidence = "instruction start inside compiled EventCmd_PartyReserveCheck; reached by its control flow"
+
+[[notcode]]
+name = "EventCommandD6_3A4C"
+addr = 0xC03A4C
+kind = "interior"
+in = "EventCmd_OpD6"
+evidence = "instruction start inside compiled EventCmd_OpD6; reached by its control flow"
+
+[[notcode]]
+name = "EventCommandFF_3FFC"
+addr = 0xC03FFC
+kind = "interior"
+in = "EventCmd_Mode7Scene"
+evidence = "instruction start inside compiled EventCmd_Mode7Scene; reached by its control flow"
+
+[[notcode]]
+name = "Obj_SetupFollower1Pc"
+addr = 0xC04310
+kind = "interior"
+in = "EventCmd_LoadAyla"
+evidence = "instruction start inside compiled EventCmd_LoadAyla; reached by its control flow"
+
+[[notcode]]
+name = "EventCommands575C62_438A"
+addr = 0xC0438A
+kind = "interior"
+in = "EventCmd_LoadAyla"
+evidence = "instruction start inside compiled EventCmd_LoadAyla; reached by its control flow"
+
+[[notcode]]
+name = "Obj_SetupFollower2Pc"
+addr = 0xC043C3
+kind = "interior"
+in = "EventCmd_LoadAyla"
+evidence = "instruction start inside compiled EventCmd_LoadAyla; reached by its control flow"
+
+[[notcode]]
+name = "EventCommands575C62_443D"
+addr = 0xC0443D
+kind = "interior"
+in = "EventCmd_LoadAyla"
+evidence = "instruction start inside compiled EventCmd_LoadAyla; reached by its control flow"
+
+[[notcode]]
+name = "EventCommand82PartialOverlap_464F"
+addr = 0xC0464F
+kind = "interior"
+in = "EventCmd_LoadNpc"
+evidence = "instruction start inside compiled EventCmd_LoadNpc; reached by its control flow"
+
+[[notcode]]
+name = "Obj_FinishNpcGfxSetup"
+addr = 0xC04799
+kind = "interior"
+in = "EventCmd_LoadEnemy"
+evidence = "instruction start inside compiled EventCmd_LoadEnemy; reached by its control flow"
+
+[[notcode]]
+name = "Obj_DecompressNpcGfxToHeap"
+addr = 0xC047FE
+kind = "interior"
+in = "EventCmd_LoadEnemy"
+evidence = "instruction start inside compiled EventCmd_LoadEnemy; reached by its control flow"
+
+[[notcode]]
+name = "Obj_UseDirectGfxPtr"
+addr = 0xC04845
+kind = "interior"
+in = "EventCmd_LoadEnemy"
+evidence = "instruction start inside compiled EventCmd_LoadEnemy; reached by its control flow"
+
+[[notcode]]
+name = "EventCommand88_48BD"
+addr = 0xC048BD
+kind = "interior"
+in = "EventCmd_PaletteCommand"
+evidence = "instruction start inside compiled EventCmd_PaletteCommand; reached by its control flow"
+
+[[notcode]]
+name = "EventCommand88_4911"
+addr = 0xC04911
+kind = "interior"
+in = "EventCmd_PaletteCommand"
+evidence = "instruction start inside compiled EventCmd_PaletteCommand; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_PaletteCmd_QueueObjTask"
+addr = 0xC04970
+kind = "interior"
+in = "EventCmd_PaletteCommand"
+evidence = "instruction start inside compiled EventCmd_PaletteCommand; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_PaletteCmd_SetObjColors"
+addr = 0xC049F8
+kind = "interior"
+in = "EventCmd_PaletteCommand"
+evidence = "instruction start inside compiled EventCmd_PaletteCommand; reached by its control flow"
+
+[[notcode]]
+name = "EventCommand2E_4A68"
+addr = 0xC04A68
+kind = "interior"
+in = "EventCmd_Op2E"
+evidence = "instruction start inside compiled EventCmd_Op2E; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_Op2E_QueuePaletteTask"
+addr = 0xC04A72
+kind = "interior"
+in = "EventCmd_Op2E"
+evidence = "instruction start inside compiled EventCmd_Op2E; reached by its control flow"
+
+[[notcode]]
+name = "EventCommand7A_4DA1"
+addr = 0xC04DA1
+kind = "interior"
+in = "EventCmd_NpcJump"
+evidence = "instruction start inside compiled EventCmd_NpcJump; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_Follow_Core"
+addr = 0xC05228
+kind = "interior"
+in = "EventCmd_FollowObject"
+evidence = "instruction start inside compiled EventCmd_FollowObject; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_MoveToward_Core"
+addr = 0xC0536B
+kind = "interior"
+in = "EventCmd_MoveTowardObject"
+evidence = "instruction start inside compiled EventCmd_MoveTowardObject; reached by its control flow"
+
+[[notcode]]
+name = "EventCommands0F171B_554B"
+addr = 0xC0554B
+kind = "interior"
+in = "EventCmd_FaceDown"
+evidence = "instruction start inside compiled EventCmd_FaceDown; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_FaceToward_Core"
+addr = 0xC055A9
+kind = "interior"
+in = "EventCmd_FaceTowardObject"
+evidence = "instruction start inside compiled EventCmd_FaceTowardObject; reached by its control flow"
+
+[[notcode]]
+name = "EventCommandsA8A9_5600"
+addr = 0xC05600
+kind = "interior"
+in = "EventCmd_FaceTowardObject"
+evidence = "instruction start inside compiled EventCmd_FaceTowardObject; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C05670"
+addr = 0xC05670
+kind = "interior"
+in = "Obj_CheckAnimDone"
+evidence = "instruction start inside compiled Obj_CheckAnimDone; reached by its control flow"
+
+[[notcode]]
+name = "EventScript_RunObjectScripts"
+addr = 0xC058DE
+kind = "interior"
+in = "EventScript_InitBlock"
+evidence = "instruction start inside compiled EventScript_InitBlock; reached by its control flow"
+
+[[notcode]]
+name = "EventScript_FetchNextCommand"
+addr = 0xC05900
+kind = "interior"
+in = "EventScript_InitBlock"
+evidence = "instruction start inside compiled EventScript_InitBlock; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C059F8"
+addr = 0xC059F8
+kind = "interior"
+in = "Field_TickObjects"
+evidence = "instruction start inside compiled Field_TickObjects; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C05A25"
+addr = 0xC05A25
+kind = "interior"
+in = "Field_TickObjects"
+evidence = "instruction start inside compiled Field_TickObjects; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C05C43"
+addr = 0xC05C43
+kind = "interior"
+in = "Sub_C05BFA"
+evidence = "instruction start inside compiled Sub_C05BFA; reached by its control flow"
+
+[[notcode]]
+name = "EventScript_InstallBuiltinScripts"
+addr = 0xC05CEC
+kind = "interior"
+in = "NewGameSave_DecompressToWork"
+evidence = "instruction start inside compiled NewGameSave_DecompressToWork; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_CallObjectFn_Core"
+addr = 0xC05FBE
+kind = "interior"
+in = "EventCmd_CallObjectFn"
+evidence = "instruction start inside compiled EventCmd_CallObjectFn; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_CallObjectFnSync_Core"
+addr = 0xC06086
+kind = "interior"
+in = "EventCmd_CallObjectFnSync"
+evidence = "instruction start inside compiled EventCmd_CallObjectFnSync; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_CallObjectFnWait_Core"
+addr = 0xC06122
+kind = "interior"
+in = "EventCmd_CallObjectFnWait"
+evidence = "instruction start inside compiled EventCmd_CallObjectFnWait; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_CallFnWait_Poll"
+addr = 0xC061A7
+kind = "interior"
+in = "EventCmd_CallObjectFnWait"
+evidence = "instruction start inside compiled EventCmd_CallObjectFnWait; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C061AF"
+addr = 0xC061AF
+kind = "interior"
+in = "EventCmd_CallObjectFnWait"
+evidence = "instruction start inside compiled EventCmd_CallObjectFnWait; reached by its control flow"
+
+[[notcode]]
+name = "EventCmd_IfOp_SkipForward"
+addr = 0xC06349
+kind = "interior"
+in = "EventCmd_IfEventMem"
+evidence = "instruction start inside compiled EventCmd_IfEventMem; reached by its control flow"
+
+[[notcode]]
+name = "EventCommand16OperatorRoutines_64B3"
+addr = 0xC064B3
+kind = "interior"
+in = "EventCommand16OperatorRoutines"
+evidence = "instruction start inside compiled EventCommand16OperatorRoutines; reached by its control flow"
+
+[[notcode]]
+name = "EventCommand16OperatorRoutines_651F"
+addr = 0xC0651F
+kind = "interior"
+in = "Sub_C064CF"
+evidence = "instruction start inside compiled Sub_C064CF; reached by its control flow"
+
+[[notcode]]
+name = "EventScript_SkipBlockByLen"
+addr = 0xC066D0
+kind = "interior"
+in = "EventCmd_IfAnyButton"
+evidence = "instruction start inside compiled EventCmd_IfAnyButton; reached by its control flow"
+
+[[notcode]]
+name = "EventCommands2D3031_6701"
+addr = 0xC06701
+kind = "interior"
+in = "EventCmd_IfAnyButton"
+evidence = "instruction start inside compiled EventCmd_IfAnyButton; reached by its control flow"
+
+[[notcode]]
+name = "EventCommands2D3031_6784"
+addr = 0xC06784
+kind = "interior"
+in = "EventCmd_IfLatch51_04"
+evidence = "instruction start inside compiled EventCmd_IfLatch51_04; reached by its control flow"
+
+[[notcode]]
+name = "NewGameSave_CopyNameField"
+addr = 0xC06897
+kind = "interior"
+in = "EventCmd_MemCopy"
+evidence = "instruction start inside compiled EventCmd_MemCopy; reached by its control flow"
+
+[[notcode]]
+name = "Field_LoadTilesetChunkTo6000"
+addr = 0xC06D65
+kind = "interior"
+in = "Field_LoadTilesetGfx"
+evidence = "instruction start inside compiled Field_LoadTilesetGfx; reached by its control flow"
+
+[[notcode]]
+name = "Obj_AssignFixedPaletteSlot"
+addr = 0xC0719B
+kind = "interior"
+in = "Sub_C07199"
+evidence = "instruction start inside compiled Sub_C07199; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C071ED"
+addr = 0xC071ED
+kind = "interior"
+in = "Sub_C07199"
+evidence = "instruction start inside compiled Sub_C07199; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0722A"
+addr = 0xC0722A
+kind = "interior"
+in = "Sub_C0721C"
+evidence = "instruction start inside compiled Sub_C0721C; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C072B2"
+addr = 0xC072B2
+kind = "interior"
+in = "Sub_C0721C"
+evidence = "instruction start inside compiled Sub_C0721C; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C072C2"
+addr = 0xC072C2
+kind = "interior"
+in = "Obj_AssignPaletteSlot1to3"
+evidence = "instruction start inside compiled Obj_AssignPaletteSlot1to3; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0734A"
+addr = 0xC0734A
+kind = "interior"
+in = "Obj_AssignPaletteSlot1to3"
+evidence = "instruction start inside compiled Obj_AssignPaletteSlot1to3; reached by its control flow"
+
+[[notcode]]
+name = "Field_DrawL1TileRowStripOdd"
+addr = 0xC07700
+kind = "interior"
+in = "Field_DrawL1TileRowStrip"
+evidence = "instruction start inside compiled Field_DrawL1TileRowStrip; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C077FE"
+addr = 0xC077FE
+kind = "interior"
+in = "Field_DrawL1TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL1TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C07840"
+addr = 0xC07840
+kind = "interior"
+in = "Field_DrawL1TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL1TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "Field_DrawL1TileColStripOdd"
+addr = 0xC0787E
+kind = "interior"
+in = "Field_DrawL1TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL1TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0792F"
+addr = 0xC0792F
+kind = "interior"
+in = "Field_RedrawL2TilemapBuf"
+evidence = "instruction start inside compiled Field_RedrawL2TilemapBuf; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0794E"
+addr = 0xC0794E
+kind = "interior"
+in = "Field_RedrawL2TilemapBuf"
+evidence = "instruction start inside compiled Field_RedrawL2TilemapBuf; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C079AE"
+addr = 0xC079AE
+kind = "interior"
+in = "Field_RedrawL2TilemapBuf"
+evidence = "instruction start inside compiled Field_RedrawL2TilemapBuf; reached by its control flow"
+
+[[notcode]]
+name = "Field_DrawL2TileRowStripOdd"
+addr = 0xC07AC1
+kind = "interior"
+in = "Field_DrawL2TileRowStrip"
+evidence = "instruction start inside compiled Field_DrawL2TileRowStrip; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C07BC3"
+addr = 0xC07BC3
+kind = "interior"
+in = "Field_DrawL2TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL2TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C07C06"
+addr = 0xC07C06
+kind = "interior"
+in = "Field_DrawL2TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL2TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "Field_DrawL2TileColStripOdd"
+addr = 0xC07C45
+kind = "interior"
+in = "Field_DrawL2TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL2TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C07D45"
+addr = 0xC07D45
+kind = "interior"
+in = "Field_RedrawL3TilemapBuf"
+evidence = "instruction start inside compiled Field_RedrawL3TilemapBuf; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C07DE7"
+addr = 0xC07DE7
+kind = "interior"
+in = "Field_DrawL3TileRowStrip"
+evidence = "instruction start inside compiled Field_DrawL3TileRowStrip; reached by its control flow"
+
+[[notcode]]
+name = "Field_DrawL3TileRowStripOdd"
+addr = 0xC07DE8
+kind = "interior"
+in = "Field_DrawL3TileRowStrip"
+evidence = "instruction start inside compiled Field_DrawL3TileRowStrip; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C07E7A"
+addr = 0xC07E7A
+kind = "interior"
+in = "Field_DrawL3TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL3TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C07EB8"
+addr = 0xC07EB8
+kind = "interior"
+in = "Field_DrawL3TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL3TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "Field_DrawL3TileColStripOdd"
+addr = 0xC07EF2
+kind = "interior"
+in = "Field_DrawL3TileColStrip"
+evidence = "instruction start inside compiled Field_DrawL3TileColStrip; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveRight"
+addr = 0xC08AB5
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveRight_Probe2"
+addr = 0xC08AE4
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C08B13"
+addr = 0xC08B13
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveLeft"
+addr = 0xC08BC4
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveUp"
+addr = 0xC08BF9
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C08C57"
+addr = 0xC08C57
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveDown"
+addr = 0xC08D11
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C08D67"
+addr = 0xC08D67
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveUpRight"
+addr = 0xC08E21
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveUpLeft"
+addr = 0xC08EF1
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveDownLeft"
+addr = 0xC08FC1
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_DownLeft_FallbackDown"
+addr = 0xC0908A
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_MoveDownRight"
+addr = 0xC0909C
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "Camera_DownRight_FallbackDown"
+addr = 0xC09163
+kind = "interior"
+in = "Map_Unk8A6D"
+evidence = "instruction start inside compiled Map_Unk8A6D; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C091BE"
+addr = 0xC091BE
+kind = "interior"
+in = "Map_Unk91AC"
+evidence = "instruction start inside compiled Map_Unk91AC; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C091DC"
+addr = 0xC091DC
+kind = "interior"
+in = "Map_Unk91AC"
+evidence = "instruction start inside compiled Map_Unk91AC; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0999D"
+addr = 0xC0999D
+kind = "interior"
+in = "Map_ProbeHitsObj"
+evidence = "instruction start inside compiled Map_ProbeHitsObj; reached by its control flow"
+
+[[notcode]]
+name = "LoadTileProperties_9AB2"
+addr = 0xC09AB2
+kind = "interior"
+in = "Map_ProbeTileAttrs"
+evidence = "instruction start inside compiled Map_ProbeTileAttrs; reached by its control flow"
+
+[[notcode]]
+name = "Camera_ComposeOutputs"
+addr = 0xC09B41
+kind = "interior"
+in = "Camera_UpdateScroll"
+evidence = "instruction start inside compiled Camera_UpdateScroll; reached by its control flow"
+
+[[notcode]]
+name = "Camera_ComposeOutputsAlt"
+addr = 0xC09B62
+kind = "interior"
+in = "Camera_UpdateScroll"
+evidence = "instruction start inside compiled Camera_UpdateScroll; reached by its control flow"
+
+[[notcode]]
+name = "Camera_ComposeOutputsByMode"
+addr = 0xC09B86
+kind = "interior"
+in = "Camera_UpdateScroll"
+evidence = "instruction start inside compiled Camera_UpdateScroll; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C09BB7"
+addr = 0xC09BB7
+kind = "interior"
+in = "Camera_UpdateScroll"
+evidence = "instruction start inside compiled Camera_UpdateScroll; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C09BBE"
+addr = 0xC09BBE
+kind = "interior"
+in = "Camera_UpdateScroll"
+evidence = "instruction start inside compiled Camera_UpdateScroll; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C09BCF"
+addr = 0xC09BCF
+kind = "interior"
+in = "Camera_UpdateScroll"
+evidence = "instruction start inside compiled Camera_UpdateScroll; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C09C4F"
+addr = 0xC09C4F
+kind = "interior"
+in = "Camera_CheckZoneMatch"
+evidence = "instruction start inside compiled Camera_CheckZoneMatch; reached by its control flow"
+
+[[notcode]]
+name = "Player_CheckExitTile"
+addr = 0xC09D2C
+kind = "interior"
+in = "Camera_ApplyVelocity"
+evidence = "instruction start inside compiled Camera_ApplyVelocity; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C09DA3"
+addr = 0xC09DA3
+kind = "interior"
+in = "Camera_ApplyVelocity"
+evidence = "instruction start inside compiled Camera_ApplyVelocity; reached by its control flow"
+
+[[notcode]]
+name = "Frame_PostScriptStage"
+addr = 0xC09DC3
+kind = "interior"
+in = "EventScript_InitBlock"
+evidence = "instruction start inside compiled EventScript_InitBlock; reached by its control flow"
+
+[[notcode]]
+name = "Obj_SelectMoveAnimFromHistory"
+addr = 0xC09ED1
+kind = "interior"
+in = "Field_MoveFollower1"
+evidence = "instruction start inside compiled Field_MoveFollower1; reached by its control flow"
+
+[[notcode]]
+name = "Obj_SelectMoveAnimFromHistory2"
+addr = 0xC09F20
+kind = "interior"
+in = "Field_MoveFollower2"
+evidence = "instruction start inside compiled Field_MoveFollower2; reached by its control flow"
+
+[[notcode]]
+name = "Obj_SelectMoveAnimFromHistoryVel"
+addr = 0xC09F6F
+kind = "interior"
+in = "Field_MoveFollower1"
+evidence = "instruction start inside compiled Field_MoveFollower1; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C09FE7"
+addr = 0xC09FE7
+kind = "interior"
+in = "Field_MoveFollower1"
+evidence = "instruction start inside compiled Field_MoveFollower1; reached by its control flow"
+
+[[notcode]]
+name = "Obj_StartWalkAnim"
+addr = 0xC0A171
+kind = "interior"
+in = "PointersToUn_C0A079"
+evidence = "instruction start inside compiled PointersToUn_C0A079; reached by its control flow"
+
+[[notcode]]
+name = "Obj_StartRunAnim"
+addr = 0xC0A18C
+kind = "interior"
+in = "PointersToUn_C0A0A1"
+evidence = "instruction start inside compiled PointersToUn_C0A0A1; reached by its control flow"
+
+[[notcode]]
+name = "Obj_SetIdleAnim"
+addr = 0xC0A1E9
+kind = "interior"
+in = "Field_MoveFollower1"
+evidence = "instruction start inside compiled Field_MoveFollower1; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0A211"
+addr = 0xC0A211
+kind = "interior"
+in = "Field_MoveFollower1"
+evidence = "instruction start inside compiled Field_MoveFollower1; reached by its control flow"
+
+[[notcode]]
+name = "Obj_StartAnim1B"
+addr = 0xC0A254
+kind = "interior"
+in = "Field_MoveFollower1"
+evidence = "instruction start inside compiled Field_MoveFollower1; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0A641"
+addr = 0xC0A641
+kind = "interior"
+in = "Map_BuildTilePropGrid"
+evidence = "instruction start inside compiled Map_BuildTilePropGrid; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0A83E"
+addr = 0xC0A83E
+kind = "interior"
+in = "Field_UpdateDrawObjects"
+evidence = "instruction start inside compiled Field_UpdateDrawObjects; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0AA43"
+addr = 0xC0AA43
+kind = "interior"
+in = "Obj_ApplyMoveVelocity"
+evidence = "instruction start inside compiled Obj_ApplyMoveVelocity; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0AA6D"
+addr = 0xC0AA6D
+kind = "interior"
+in = "Obj_ApplyMoveVelocity"
+evidence = "instruction start inside compiled Obj_ApplyMoveVelocity; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0AA95"
+addr = 0xC0AA95
+kind = "interior"
+in = "Obj_ApplyMoveVelocity"
+evidence = "instruction start inside compiled Obj_ApplyMoveVelocity; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0AAB9"
+addr = 0xC0AAB9
+kind = "interior"
+in = "Obj_ApplyMoveVelocity"
+evidence = "instruction start inside compiled Obj_ApplyMoveVelocity; reached by its control flow"
+
+[[notcode]]
+name = "Obj_ApplyVelocityAirborne"
+addr = 0xC0AAC7
+kind = "interior"
+in = "Obj_ApplyMoveVelocity"
+evidence = "instruction start inside compiled Obj_ApplyMoveVelocity; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0ADD7"
+addr = 0xC0ADD7
+kind = "interior"
+in = "Obj_ComputeVelocityFromAngle"
+evidence = "instruction start inside compiled Obj_ComputeVelocityFromAngle; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0ADEB"
+addr = 0xC0ADEB
+kind = "interior"
+in = "Obj_ComputeVelocityFromAngle"
+evidence = "instruction start inside compiled Obj_ComputeVelocityFromAngle; reached by its control flow"
+
+[[notcode]]
+name = "Obj_MoveAtAngleSetPriority"
+addr = 0xC0AE37
+kind = "interior"
+in = "Obj_ComputeVelocityFromAngle"
+evidence = "instruction start inside compiled Obj_ComputeVelocityFromAngle; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0AF04"
+addr = 0xC0AF04
+kind = "interior"
+in = "Obj_ComputeVelocityFromAngle"
+evidence = "instruction start inside compiled Obj_ComputeVelocityFromAngle; reached by its control flow"
+
+[[notcode]]
+name = "Obj_StoreMoveDeltas"
+addr = 0xC0AF18
+kind = "interior"
+in = "Obj_ComputeVelocityFromAngle"
+evidence = "instruction start inside compiled Obj_ComputeVelocityFromAngle; reached by its control flow"
+
+[[notcode]]
+name = "Obj_EmitOamEntriesSize1"
+addr = 0xC0B3DF
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "Obj_EmitOam8Entries_Loop"
+addr = 0xC0B427
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0B45B"
+addr = 0xC0B45B
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0B489"
+addr = 0xC0B489
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "Obj_EmitOamEntriesSize2"
+addr = 0xC0B4B8
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0B50A"
+addr = 0xC0B50A
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0B53E"
+addr = 0xC0B53E
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0B576"
+addr = 0xC0B576
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "Obj_EmitOamEntriesSize3"
+addr = 0xC0B5AF
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0B61F"
+addr = 0xC0B61F
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0B6AA"
+addr = 0xC0B6AA
+kind = "interior"
+in = "Spr_AppendToOam"
+evidence = "instruction start inside compiled Spr_AppendToOam; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0BC50"
+addr = 0xC0BC50
+kind = "interior"
+in = "Spr_Place8"
+evidence = "instruction start inside compiled Spr_Place8; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0BE46"
+addr = 0xC0BE46
+kind = "interior"
+in = "Spr_Load8"
+evidence = "instruction start inside compiled Spr_Load8; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0BF1C"
+addr = 0xC0BF1C
+kind = "interior"
+in = "Spr_Load8"
+evidence = "instruction start inside compiled Spr_Load8; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0C13B"
+addr = 0xC0C13B
+kind = "interior"
+in = "Spr_Place12"
+evidence = "instruction start inside compiled Spr_Place12; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0C483"
+addr = 0xC0C483
+kind = "interior"
+in = "Spr_Load12"
+evidence = "instruction start inside compiled Spr_Load12; reached by its control flow"
+
+[[notcode]]
+name = "Spr_Place24"
+addr = 0xC0C73A
+kind = "interior"
+in = "Spr_PrepareTiles"
+evidence = "instruction start inside compiled Spr_PrepareTiles; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0C820"
+addr = 0xC0C820
+kind = "interior"
+in = "Spr_PrepareTiles"
+evidence = "instruction start inside compiled Spr_PrepareTiles; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0C875"
+addr = 0xC0C875
+kind = "interior"
+in = "Spr_PrepareTiles"
+evidence = "instruction start inside compiled Spr_PrepareTiles; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0C9C6"
+addr = 0xC0C9C6
+kind = "interior"
+in = "Obj_AnimTickAndQueue"
+evidence = "instruction start inside compiled Obj_AnimTickAndQueue; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0C9D0"
+addr = 0xC0C9D0
+kind = "interior"
+in = "Obj_AnimTickAndQueue"
+evidence = "instruction start inside compiled Obj_AnimTickAndQueue; reached by its control flow"
+
+[[notcode]]
+name = "Field_AnimComputeFramePtr"
+addr = 0xC0CA18
+kind = "interior"
+in = "Obj_AnimTickAndQueue"
+evidence = "instruction start inside compiled Obj_AnimTickAndQueue; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrameLayout"
+addr = 0xC0CB0A
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0CB11"
+addr = 0xC0CB11
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "Field_AnimReadFrameByte"
+addr = 0xC0CBC2
+kind = "interior"
+in = "Obj_AnimFrameLookup"
+evidence = "instruction start inside compiled Obj_AnimFrameLookup; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame4"
+addr = 0xC0CBDC
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Field_StreamFrameTilesToCache"
+addr = 0xC0CC04
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_FrameLayout4"
+addr = 0xC0CDC8
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame8"
+addr = 0xC0CEF5
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_FrameLayout8"
+addr = 0xC0D124
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0D1A7"
+addr = 0xC0D1A7
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0D1C1"
+addr = 0xC0D1C1
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame8Pass0"
+addr = 0xC0D28A
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame8Pass1"
+addr = 0xC0D30D
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame12"
+addr = 0xC0D4F7
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame12Pass0Alt"
+addr = 0xC0D608
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame12Pass1"
+addr = 0xC0D68B
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame12Pass1Alt"
+addr = 0xC0D738
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame12Pass2"
+addr = 0xC0D7E5
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0D958"
+addr = 0xC0D958
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0D9C0"
+addr = 0xC0D9C0
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_BuildFrame12Pass2Alt"
+addr = 0xC0DA69
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DBAF"
+addr = 0xC0DBAF
+kind = "interior"
+in = "Obj_BuildSpriteFrameStep"
+evidence = "instruction start inside compiled Obj_BuildSpriteFrameStep; reached by its control flow"
+
+[[notcode]]
+name = "Obj_FrameLayout12"
+addr = 0xC0DD28
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DD66"
+addr = 0xC0DD66
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DDCE"
+addr = 0xC0DDCE
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DDE8"
+addr = 0xC0DDE8
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DE02"
+addr = 0xC0DE02
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DE1C"
+addr = 0xC0DE1C
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DE6A"
+addr = 0xC0DE6A
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DE84"
+addr = 0xC0DE84
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "CODE_JL_C0DF2F"
+addr = 0xC0DF2F
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DF61"
+addr = 0xC0DF61
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DF7B"
+addr = 0xC0DF7B
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DF95"
+addr = 0xC0DF95
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DFAF"
+addr = 0xC0DFAF
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DFE3"
+addr = 0xC0DFE3
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0DFFD"
+addr = 0xC0DFFD
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E031"
+addr = 0xC0E031
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E065"
+addr = 0xC0E065
+kind = "interior"
+in = "Field_PlacePcObjFromSaved"
+evidence = "instruction start inside compiled Field_PlacePcObjFromSaved; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E18D"
+addr = 0xC0E18D
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E212"
+addr = 0xC0E212
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E22C"
+addr = 0xC0E22C
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E260"
+addr = 0xC0E260
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E2AE"
+addr = 0xC0E2AE
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E2C8"
+addr = 0xC0E2C8
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E34A"
+addr = 0xC0E34A
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E364"
+addr = 0xC0E364
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E37E"
+addr = 0xC0E37E
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E398"
+addr = 0xC0E398
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E3E6"
+addr = 0xC0E3E6
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E400"
+addr = 0xC0E400
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E41A"
+addr = 0xC0E41A
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0E434"
+addr = 0xC0E434
+kind = "interior"
+in = "Spr_LoadLargeObj"
+evidence = "instruction start inside compiled Spr_LoadLargeObj; reached by its control flow"
+
+[[notcode]]
+name = "Spr_CopyTileD4"
+addr = 0xC0E739
+kind = "interior"
+in = "Spr_CopyTile"
+evidence = "instruction start inside compiled Spr_CopyTile; reached by its control flow"
+
+[[notcode]]
+name = "Spr_CopyTileD2"
+addr = 0xC0E7BC
+kind = "interior"
+in = "Spr_CopyTile"
+evidence = "instruction start inside compiled Spr_CopyTile; reached by its control flow"
+
+[[notcode]]
+name = "Spr_CopyTileD3"
+addr = 0xC0E83F
+kind = "interior"
+in = "Spr_CopyTile"
+evidence = "instruction start inside compiled Spr_CopyTile; reached by its control flow"
+
+[[notcode]]
+name = "Spr_CopyTile7F"
+addr = 0xC0E8C2
+kind = "interior"
+in = "Spr_CopyTile"
+evidence = "instruction start inside compiled Spr_CopyTile; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0EA51"
+addr = 0xC0EA51
+kind = "interior"
+in = "SprBuf_FreeObj"
+evidence = "instruction start inside compiled SprBuf_FreeObj; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0EACE"
+addr = 0xC0EACE
+kind = "interior"
+in = "Field_NmiHandler"
+evidence = "instruction start inside compiled Field_NmiHandler; reached by its control flow"
+
+[[notcode]]
+name = "UNREACH_C0EB46"
+addr = 0xC0EB46
+kind = "interior"
+in = "Field_NmiHandler"
+evidence = "instruction start inside compiled Field_NmiHandler; reached by its control flow"
+
+[[notcode]]
+name = "Vblank_DialogRowThenTail"
+addr = 0xC0EB79
+kind = "interior"
+in = "Field_NmiHandler"
+evidence = "instruction start inside compiled Field_NmiHandler; reached by its control flow"
+
+[[notcode]]
+name = "Vblank_CommonTail"
+addr = 0xC0EB86
+kind = "interior"
+in = "Field_NmiHandler"
+evidence = "instruction start inside compiled Field_NmiHandler; reached by its control flow"
+
+[[notcode]]
+name = "Vblank_CommonEnd"
+addr = 0xC0EC15
+kind = "interior"
+in = "Field_NmiHandler"
+evidence = "instruction start inside compiled Field_NmiHandler; reached by its control flow"
+
+[[notcode]]
+name = "Vblank_AnimTileWords_Phase2"
+addr = 0xC0EE8B
+kind = "interior"
+in = "Vblank_UpdateAnimTileWords"
+evidence = "instruction start inside compiled Vblank_UpdateAnimTileWords; reached by its control flow"
+
+[[notcode]]
+name = "Vblank_AnimTileWords_DoorCells"
+addr = 0xC0EFD1
+kind = "interior"
+in = "Vblank_UpdateAnimTileWords"
+evidence = "instruction start inside compiled Vblank_UpdateAnimTileWords; reached by its control flow"
+
+[[notcode]]
+name = "CODE_C0F0C9"
+addr = 0xC0F0C9
+kind = "interior"
+in = "Dialog_DrawChoiceCursor"
+evidence = "instruction start inside compiled Dialog_DrawChoiceCursor; reached by its control flow"
+
+[[notcode]]
+name = "BankC0_OldBuildLeftovers"
+addr = 0xC0F170
+kind = "data"
+evidence = "ChronoRET: 400 bytes C0F170-C0F2FF of leftover bytes from an older build; no JSR/JMP/table references; dscotton notes its code-looking blocks end in a BRA into mid-instruction"
+
+[[notcode]]
+name = "BitReverseTable"
+addr = 0xC0FD00
+kind = "data"
+evidence = "256-byte lookup table, only read via LDA abs,X (ChronoRET: WMDATA bit-reverse table)"
+
+[[notcode]]
+name = "AppearsDebugRelatedInfiniteLoo"
+addr = 0xC0FF18
+kind = "sentinel"
+evidence = "LDA.L from an unmapped address then BRA to itself; only referenced by the BRK/COP vector words at $C0FFE6/$C0FFF4; never returns"

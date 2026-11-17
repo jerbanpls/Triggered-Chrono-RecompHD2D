@@ -117,16 +117,45 @@ for op, what in ((0x6C, 'JMP (abs)'), (0xDC, 'JML [abs]')):
         else ['cpu->PB = 0xE4;']
     check(all(w in src for w in want), what + ': emits bank-0 pointer read and interpreter dispatch')
 
-# PLP of a byte pushed before entry: M/X unknown, the rest is interpreted
+# PLP of a byte pushed before entry: M/X unknown. The continuation (PLX, RTS)
+# is decoded for each M/X and picked at run time (#93)
 fn = decode.decode_function(rom_with(bytes([0x28, 0xFA, 0x60])), 0xE48000, m1x0, Dyn())
-check(list(fn.plp_interp) and [i.addr for i in fn.insns] == [0xE48000], 'PLP of unknown M/X: path ends')
+check(list(fn.plp_interp) and sorted(fn.plp_interp[next(iter(fn.plp_interp))][1]) ==
+      [(False, False), (False, True), (True, False), (True, True)] and
+      {(i.m, i.x) for i in fn.insns if i.addr == 0xE48001} ==
+      {(False, False), (False, True), (True, False), (True, True)},
+      'PLP of unknown M/X: continuation decoded per M/X')
+check(('RTS', True, True) in fn.exit_states and ('?', None, None) not in fn.exit_states,
+      'PLP of unknown M/X: every combination compiled, exits known')
 fm = funcs.FuncMeta('T', 0xE48000, ('m1x0',), 0, None, None, 'bankE4')
 src = '\n'.join(emit.emit_function(fm, fn))
-check('set_p(cpu, pull8(cpu));' in src and 'cpu->PC = 0x8001;' in src and 'ct_tail_rest(cpu, s0);' in src,
-      'PLP of unknown M/X: emits the pull and the interpreter hand-off')
+check('set_p(cpu, pull8(cpu));' in src and 'if (cpu->m == 1 && cpu->x == 0) goto L_E48001_m1x0;' in src
+      and 'cpu->PC = 0x8001;' in src and 'ct_tail_rest(cpu, s0);' in src,
+      'PLP of unknown M/X: emits the pull, the run-time M/X dispatch and the interpreter fallback')
+# a continuation that decodes in no width (WDM) stays with the interpreter
+fn = decode.decode_function(rom_with(bytes([0x28, 0x42, 0x00])), 0xE48000, m1x0, Dyn())
+check(list(fn.plp_interp.values())[0][1] == [] and [i.addr for i in fn.insns] == [0xE48000] and
+      ('?', None, None) in fn.exit_states, 'PLP of unknown M/X: undecodable continuation is interpreted')
 # PHP, TCS, PLP: the stack pointer was reloaded, so the pushed P is not the one pulled
 fn = decode.decode_function(rom_with(bytes([0x08, 0x1B, 0x28, 0xFA, 0x60])), 0xE48000, m1x0, Dyn())
 check(list(fn.plp_interp), 'TCS drops the tracked stack')
+
+# JSR ($9000,X) of unknown length: the callee may come back in another M/X, so the
+# continuation (REP #$30, RTS: the same exit whatever the pair) is decoded for each
+# pair and picked at run time (#93). One that exits differently stays interpreted.
+fn = decode.decode_function(rom_with(bytes([0xFC, 0x00, 0x90, 0xC2, 0x30, 0x60])), 0xE48000, m1x0, Dyn())
+check(sorted(fn.dyn_alts.get(next(iter(fn.dyn_tables)), [])) ==
+      [(False, False), (False, True), (True, True)] and
+      {(i.m, i.x) for i in fn.insns if i.addr == 0xE48003} ==
+      {(False, False), (False, True), (True, False), (True, True)},
+      'JSR (abs,X): continuation decoded for the other M/X pairs')
+fm = funcs.FuncMeta('T', 0xE48000, ('m1x0',), 0, None, None, 'bankE4')
+src = '\n'.join(emit.emit_function(fm, fn))
+check('if (cpu->m == 0 && cpu->x == 0) goto L_E48003_m0x0;' in src and
+      'if (cpu->m != 1 || cpu->x != 0) {' in src,
+      'JSR (abs,X): emits the run-time M/X pick after the call')
+fn = decode.decode_function(rom_with(bytes([0xFC, 0x00, 0x90, 0x60])), 0xE48000, m1x0, Dyn())
+check(fn.dyn_alts.get(next(iter(fn.dyn_tables))) == [], 'JSR (abs,X): a pair that exits differently stays interpreted')
 
 print(f"decode_calls: {'ok' if not fails else str(fails) + ' failed'}")
 sys.exit(1 if fails else 0)
