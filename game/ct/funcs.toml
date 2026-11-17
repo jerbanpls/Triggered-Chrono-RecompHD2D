@@ -1977,6 +1977,14 @@ state = "m1x0"
 returns = "RTL"
 exit_state = "m1x0"
 
+# Audio_SendPlaySongCmd (JSR from Audio_PlaySongCmd): when the APU replies
+# busy it pops its own return address and the PHP byte (PLA x3) and jumps to
+# Audio_ServiceExit, which restores the service call's saved registers and
+# RTLs out of the whole service call. That tail never returns to the JSR
+# caller, so the RTL it ends in is not an exit of this RTS routine.
+[[handoff]]
+site = 0xC70A93
+
 # Not registered on purpose: $C198C5 (EnemyAI action-prep case 4). It ends in
 # JMP $8C90 into the loop that calls it, so as an entry it would swallow that
 # loop and its callee's RTS would be ambiguous. tools/discover.py proposes it
