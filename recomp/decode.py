@@ -744,7 +744,9 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
                         fn.exit_states.add(('?', None, None))
                     break
                 fn.tails[ikey] = (i.operand, cst)
-                fn.exit_states |= resolve.tail_required(addr, i.operand, cst)
+                exits = resolve.tail_required(addr, i.operand, cst)
+                if addr not in getattr(resolve, 'handoffs', ()):   # [[handoff]]: no return
+                    fn.exit_states |= exits
                 break
             elif mn == 'JMP' and i.mode == 'abs':
                 target = (addr & 0xFF0000) | i.operand
@@ -755,7 +757,8 @@ def decode_function(rom: bytes, entry: int, st: State, resolve=None) -> Function
                 exits = resolve.tail(addr, target, cst) if resolve is not None and not own else None
                 if exits is not None:
                     fn.tails[ikey] = (target, cst)
-                    fn.exit_states |= exits
+                    if addr not in getattr(resolve, 'handoffs', ()):   # [[handoff]]: no return
+                        fn.exit_states |= exits
                     break
                 addr, cur = target, nxt
                 continue
