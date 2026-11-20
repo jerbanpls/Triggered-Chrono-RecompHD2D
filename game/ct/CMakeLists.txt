@@ -208,6 +208,8 @@ add_test(NAME sync_determinism COMMAND ${Python3_EXECUTABLE} ${GAME_DIR}/test/te
 set_tests_properties(sync_determinism PROPERTIES SKIP_RETURN_CODE 77)
 add_test(NAME manual_root COMMAND ${Python3_EXECUTABLE} ${GAME_DIR}/test/test_manual_root.py)
 add_test(NAME notcode COMMAND ${Python3_EXECUTABLE} ${GAME_DIR}/test/test_notcode.py)
+add_test(NAME hd2d_shots COMMAND ${Python3_EXECUTABLE} ${GAME_DIR}/test/test_hd2d_shots.py)
+list(APPEND ct_game_tests hd2d_shots)
 add_test(NAME discover_loop COMMAND ${Python3_EXECUTABLE} ${GAME_DIR}/test/test_discover_loop.py)
 list(APPEND ct_game_tests sync_determinism manual_root notcode)
 

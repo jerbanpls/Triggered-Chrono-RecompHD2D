@@ -61,6 +61,25 @@ SDL_VIDEODRIVER=offscreen SDL_AUDIODRIVER=dummy build/ct_sdl --hd2d --fast \
     --frames 9200 --script game/ct/test/replay/leene_square.txt --shot 9200:leene.png
 ```
 
+### Taking comparison shots
+
+`game/ct/tools/hd2d_shots.py` gives a repeatable before/after picture. It builds nothing: it
+runs the built `ct_sdl_engine` and game module, offscreen and muted, with private XDG
+folders, once per replay, preset (`off`, `hd2d`, `hd2d3d`, `deck3d`) and size (1038x556,
+1920x1080), taking the frames listed in the tool (Leene Square, the narrator, Crono's room,
+the house, the opening flyover, one battle, one field menu, one world map). In the box:
+
+```
+python3 game/ct/tools/hd2d_shots.py --label before
+```
+
+It writes `build/qa/<label>/<preset>_<size>/<frame>.png`, one contact sheet per frame
+(`sheet_<frame>.png`, the presets side by side) and `timings.txt`: the median GPU ms per
+pass from `CT_HD2D_PROFILE`, per preset and size. The shots and timings are ROM-derived
+and stay in `build/qa/`; the GPU is the build box's, not the ROG Ally's, so compare runs
+on the same machine. `--only`, `--presets`, `--sizes`, `--dry-run` and `--list` narrow
+or preview a run.
+
 ## How it works
 
 1. **Layer G-buffer.** The PPU (`third_party/snes/ppu.c`) writes a second buffer next to
