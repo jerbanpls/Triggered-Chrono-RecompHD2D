@@ -14,33 +14,33 @@ COV = os.path.join(REPO, "tools", "coverage.py")
 FUNCS = """
 [[func]]
 name = "A_One"
-addr = 0xC10000
+addr = 0xE10000
 [[func]]
 name = "A_One"
-addr = 0xC10000
+addr = 0xE10000
 states = ["m0x0"]
 [[func]]
 name = "B_Two"
-addr = 0xC10010
+addr = 0xE10010
 [[func]]
 name = "C_Three"
-addr = 0xC20000
+addr = 0xE20000
 [[func]]
 name = "D_Four"
-addr = 0xC20020
+addr = 0xE20020
 [[func]]
 name = "Label"
-addr = 0xC20040
+addr = 0xE20040
 """
 NOTCODE = """
 [[notcode]]
 name = "Label"
-addr = 0xC20040
+addr = 0xE20040
 kind = "interior"
 """
-FIRST = "C10000 12\nC10005 40\nC20020 99\nFFFFFF 1\n"
+FIRST = "E10000 12\nE10005 40\nE20020 99\nFFFFFF 1\n"
 PROFILE = ("profile: 100 instructions, 0.00% native (0 native, 100 interpreted)\n"
-           "profile:  50.00%  $C10010 m1x1e0 B_Two        overlay\n"
+           "profile:  50.00%  $E10010 m1x1e0 B_Two        overlay\n"
            "profile:  10.00%  $000000 m0x0e0              outside any call (reset code, main loop)\n")
 
 
@@ -62,17 +62,17 @@ def main():
         r = run("--game", game, "--from-output", f1)
         if r.returncode or "executed 2  never executed 2  total 4" not in r.stdout:
             fails.append("first-exec counts: " + r.stdout + r.stderr)
-        if "$C10010 B_Two" not in r.stdout or "$C20000 C_Three" not in r.stdout:
+        if "$E10010 B_Two" not in r.stdout or "$E20000 C_Three" not in r.stdout:
             fails.append("never-executed list")
         if "Label" in r.stdout:
             fails.append("notcode label counted")
-        if "bank $C1: 1/2 executed" not in r.stdout or "bank $C2: 1/2 executed" not in r.stdout:
+        if "bank $E1: 1/2 executed" not in r.stdout or "bank $E2: 1/2 executed" not in r.stdout:
             fails.append("bank tally")
         r = run("--game", game, "--from-output", f2)
         if "executed 1  never executed 3  total 4" not in r.stdout:
             fails.append("profile counts: " + r.stdout)
         r = run("--game", game, "--from-output", f1, f2)   # union
-        if "executed 3  never executed 1  total 4" not in r.stdout or "$C20000 C_Three" not in r.stdout:
+        if "executed 3  never executed 1  total 4" not in r.stdout or "$E20000 C_Three" not in r.stdout:
             fails.append("union: " + r.stdout)
         r = run("--game", game, "--from-output", f1, "--summary")
         if "never executed, bank" in r.stdout:
