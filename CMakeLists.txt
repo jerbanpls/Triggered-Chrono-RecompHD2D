@@ -440,6 +440,12 @@ add_executable(test_packs test/test_packs.c)   # port: asset packs
 target_link_libraries(test_packs ct_packs ct_runtime)
 target_compile_options(test_packs PRIVATE ${CT_WARN} -Wno-format-truncation)
 add_test(NAME packs COMMAND test_packs ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+# PNG writer, WAV writer and hardware-note log (ROM-free).
+add_executable(test_gpl_support test/test_gpl_support.c)
+target_include_directories(test_gpl_support PRIVATE test)
+target_link_libraries(test_gpl_support ct_runtime)
+target_compile_options(test_gpl_support PRIVATE ${CT_WARN})
+add_test(NAME gpl_support COMMAND test_gpl_support ${CMAKE_BINARY_DIR}/test_gpl_support_tmp)
 # port: the installed data dir can build a module (every header the game's C
 # includes is installed); a gap here breaks every packaged first run.
 add_test(NAME install_layout COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/test_install_layout.py
