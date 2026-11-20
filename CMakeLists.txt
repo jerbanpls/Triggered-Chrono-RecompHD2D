@@ -464,6 +464,8 @@ add_test(NAME pack_upscale COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tes
 add_test(NAME decode_calls COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/test_decode_calls.py)
 add_test(NAME funcs_meta COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/test_funcs_meta.py)
 add_test(NAME replay_gen COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/test_replay_gen.py)   # port: tools/replay_gen.py
+# tools/coverage.py (function coverage of the replays) on synthetic output, no ROM.
+add_test(NAME coverage_report COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/test/test_coverage.py)
 
 if(SDL2_FOUND)
     add_executable(test_input test/test_input.c)
