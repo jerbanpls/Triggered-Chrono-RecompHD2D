@@ -303,7 +303,7 @@ if(SDL2_FOUND)
     target_compile_definitions(ct_menu PRIVATE CT_MENU_FONT)
     # The version the menu's About tab shows (the release in
     # packaging/*.metainfo.xml), with the commit the build was configured at.
-    set(CT_VERSION_STRING "0.1.0-beta.1")
+    set(CT_VERSION_STRING "0.1.0-beta.2")
     find_package(Git QUIET)
     if(GIT_FOUND)
         execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD

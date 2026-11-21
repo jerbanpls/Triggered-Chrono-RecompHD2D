@@ -4,7 +4,7 @@
 
 **Chrono Trigger, rebuilt as a native PC game from your own copy, with an optional HD-2D look.**
 Not an emulator wrapper: the game's 65816 code is statically recompiled to C and compiled for your machine.
-Linux first, Steam Deck and ROG Ally tuned, Windows and Android on the way.
+Linux first, Steam Deck and ROG Ally tuned, an experimental Windows build, Android on the way.
 
 [![ci](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml/badge.svg)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml)
 [![port](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml/badge.svg)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml)
@@ -33,7 +33,7 @@ controller, and open enough that anyone can help finish it.
 | Looks | The original picture by default. HD-2D (flat or 3D diorama) is one switch away: menu, Look tab, or `--hd2d`. Presets from light to full, tuned for the Steam Deck and ROG Ally. |
 | Recompiled | Every function we have found (2115) is native C, and 99.8% to 99.9% of the instructions in each of our replays run as native code. The built-in interpreter covers the rest, so the game is complete either way. "Found so far" is the catch: only recordings of the whole game can show what we have not reached. |
 | Comfort | Quick menu on F1 (time, look, overlays, controls and save tiles), rewind, slow motion, frame step, save backups, corner overlays (FPS, clock, battery, play time), A/B and X/Y swap, player lights on pads that have them, touch controls. |
-| Not yet | Windows, Android and Flatpak builds are not published. Controller work for the 2026 Steam Controller is planned. Expect rough edges. |
+| Not yet | Android and Flatpak builds are not published. The Windows build ([docs/WINDOWS.md](docs/WINDOWS.md)) is experimental: tested under Wine and in CI, not yet played on real Windows hardware. Controller work for the 2026 Steam Controller is planned. Expect rough edges. |
 
 ![Progress to a fully native Chrono Trigger: every known function compiled, 99.8% to 99.9% of instructions native on the recorded replays, whole-game coverage not yet measured](docs/progress.svg)
 
@@ -146,7 +146,7 @@ measured on the same repository.
 | Automated tests | 67 | about 140 |
 | Files in the repository | 135 | about 570 |
 | Frontend | SDL2 window and input | quick menu, rewind, slow motion, frame step, overlays, save backups, controller layer (glyphs, rumble, Steam Deck and ROG Ally presets), touch, asset and audio packs, HD text, optional HD-2D renderer |
-| Releases | none | three Linux pre-releases (AppImage), a Windows port in progress, Android scaffolding in the tree |
+| Releases | none | Linux pre-releases (AppImage), an experimental Windows zip, Android scaffolding in the tree |
 
 What this does not say: both projects keep moving, and the left column is only what we received. The whole-game native claim is
 still unproven: our recordings reach about two thirds of the known functions, and the SNES picture and sound cores are still
