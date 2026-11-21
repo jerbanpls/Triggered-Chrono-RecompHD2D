@@ -8,7 +8,7 @@
  *
  * Files, in the per-game preferences folder (SDL_GetPrefPath("ct-recomp",
  * GAME_ID)):
- *   ct_game.so     the module (tools/build_module.py --out)
+ *   ct_game.so     the module (tools/build_module.py --out); ct_game.dll on Windows
  *   ct_game.stamp  rom_sha1=HEX and module_abi=N: what it was built from
  *   rom_path       the last ROM that passed the check
  *
@@ -44,5 +44,12 @@ enum { FIRSTRUN_MODULE, FIRSTRUN_INTERP, FIRSTRUN_QUIT, FIRSTRUN_ERROR };
    module installed (ct_module_load); FIRSTRUN_QUIT: the user closed the
    window; FIRSTRUN_ERROR: a setup problem, printed to stderr. */
 int firstrun(const firstrun_opts *o);
+
+#ifdef _WIN32
+/* Windows: call first thing in main. With no valid standard handles (a GUI
+   program started from the Explorer), stdout and stderr go to ct_sdl.log in
+   the preferences folder; with a console or redirection they are left alone. */
+void firstrun_log_redirect(const char *game_id);
+#endif
 
 #endif

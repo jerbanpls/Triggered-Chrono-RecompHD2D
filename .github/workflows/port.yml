@@ -53,6 +53,36 @@ jobs:
           done
           exit $status
 
+  # port: the engine on 64-bit Windows (MSYS2 UCRT64, MinGW-w64). Same
+  # engine-only tree and ROM-free tests as `build`; no game, no ROM.
+  windows:
+    name: engine-only build and tests (Windows)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-SDL2
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-git
+      - name: Configure
+        run: |
+          unset CT_ROM
+          cmake -S . -B build -G Ninja -DCT_ENGINE_ONLY=ON -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+      - name: Build
+        run: cmake --build build -j "$(nproc)" -- -k 0   # every error at once, not the first
+      - name: Test
+        run: ctest --test-dir build -LE rom --output-on-failure
+
   lint:
     name: lint (game-agnostic, REUSE)
     runs-on: ubuntu-latest
@@ -89,6 +119,49 @@ jobs:
           path: ct-recomp-engine-x86_64.tar.gz
           if-no-files-found: error
           retention-days: 14
+
+  # EXPERIMENTAL Windows package: cross-built on Linux with zig
+  # (packaging/windows/build.sh), uploaded only after check_dist passed on
+  # the exact zip. No ROM, no generated code, no module in it.
+  windows-package:
+    name: Windows package (cross-build, check_dist)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build curl unzip
+      - name: Build the package
+        run: env -u CT_ROM CMAKE_GENERATOR=Ninja sh packaging/windows/build.sh "$PWD/build-win64"
+      - name: check_dist (no ROM; the ROM-window check is skipped)
+        run: python3 tools/check_dist.py --quiet build-win64/CT_Recomp-win64.zip
+      - name: Upload the package (only after check_dist passed)
+        uses: actions/upload-artifact@v4
+        with:
+          name: CT_Recomp-win64
+          path: build-win64/CT_Recomp-win64.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  # The check that the package's own Python and the UNMODIFIED zig.exe work on
+  # a real Windows machine: build the synthetic test module and load it with
+  # the package's ct_boot_engine.exe. No ROM.
+  windows-package-test:
+    name: Windows package test (real Windows, unmodified zig)
+    needs: [windows-package]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: CT_Recomp-win64
+          path: dl
+      - name: Unpack
+        shell: pwsh
+        run: Expand-Archive -Path dl\CT_Recomp-win64.zip -DestinationPath pkg
+      - name: Build and load the synthetic module with the package's own tools
+        shell: cmd
+        run: packaging\windows\synth\ci-module.bat "%GITHUB_WORKSPACE%\pkg\CT_Recomp" "%GITHUB_WORKSPACE%\packaging\windows\synth"
 
   # NOT YET TESTED IN CI: packaging/appimage/build.sh has only been run on a
   # developer machine. It is allowed to fail until it has passed here.

@@ -16,6 +16,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+#include "platform.h"   /* port: Windows: rename that replaces */
 
 static int on[OVERLAY_COUNT], corner = OVERLAY_TR;
 

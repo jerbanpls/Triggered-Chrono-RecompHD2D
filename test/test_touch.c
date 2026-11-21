@@ -9,6 +9,7 @@
 
 #include "input.h"
 #include "touch.h"
+#include "platform.h"   /* port: Windows: mkdir with no mode, setenv */
 
 static long checks, fails;
 #define CHECK(c, ...)                                                    \
@@ -59,9 +60,8 @@ int main(void)
     /* Keep any saved layout out of it: the user's, and one an earlier run
        saved from edit mode (a fixed TMPDIR would keep it). A fresh
        directory every run. */
-    const char *tmp = getenv("TMPDIR");
     static char dir[4096];
-    snprintf(dir, sizeof dir, "%s/test_touch.XXXXXX", tmp && *tmp ? tmp : "/tmp");
+    snprintf(dir, sizeof dir, "%s/test_touch.XXXXXX", ct_tmpdir());
     if (!mkdtemp(dir)) {
         perror("test_touch: mkdtemp");
         return 1;

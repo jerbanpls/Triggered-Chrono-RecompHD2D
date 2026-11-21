@@ -3151,6 +3151,9 @@ int main(int argc, char **argv)
     static int no_save;
     static const char *import_srm, *export_srm;   /* port: QOL */
     static int recording, scripted;
+#if defined(_WIN32) && defined(CT_FIRSTRUN)
+    firstrun_log_redirect(game_id);   /* port: a GUI program has no console to print to */
+#endif
     register_settings();   /* port: the settings registry (settings.h), before reading them */
     settings_load();   /* port: saved HD-2D settings; options below override */
     for (int k = 1; k < argc; k++) {

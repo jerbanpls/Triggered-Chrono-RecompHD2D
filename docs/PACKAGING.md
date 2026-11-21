@@ -363,3 +363,63 @@ No package contains code or data derived from a ROM:
 
 The module the user builds, the ROM path and the saves stay in the user's data dir and
 never enter a package.
+
+## Windows package (experimental)
+
+`CT_Recomp-win64.zip` is cross-built **on Linux** with zig; no Windows machine and no
+MinGW install are needed. See [WINDOWS.md](WINDOWS.md) for what is inside and how a
+player uses it.
+
+```
+packaging/windows/build.sh [OUT]        # default: build-win64/ (git-ignored)
+```
+
+It needs cmake, ninja or make, curl, unzip and Python 3 (it re-runs itself in the
+`ct-build` distrobox when cmake is missing; set `CMAKE_GENERATOR=Ninja` on CI). It
+downloads and SHA-256-checks zig 0.15.2 (Linux, for the cross-compile; Windows zip,
+for the package), the SDL2 2.32.10 MinGW dev package and the embeddable Python 3.13
+(python.org publishes MD5 only, so that SHA-256 is the one recorded at first download),
+cross-builds `ct_sdl_engine.exe` and `ct_boot_engine.exe` (`cmake/zig-windows.cmake`;
+zig's linker exports nothing from an exe, so the engine's symbols are listed in
+`ct_engine.def` and the import libraries come from it), assembles `OUT/stage/` and
+writes `OUT/CT_Recomp-win64.zip`. The last line is `WIN-BUILD-OK`.
+
+- **Trimming:** `packaging/windows/trim-zig-win.sh` removes everything but what
+  compiling and linking C for `x86_64-windows-gnu` needs (other targets' libc
+  sources and headers, C++ runtimes, sanitizers, docs, other CPU families' clang
+  headers, mingw 32-bit and ARM parts): zig goes from 313 MB to about 270 MB, of which
+  `zig.exe` itself is 169 MB and is shipped unmodified.
+- **Reproducible:** files are written in sorted order with fixed timestamps (2026-01-01),
+  fixed permissions and compression level 9, and `__pycache__` is dropped. Two builds on
+  the same machine give the same zip bytes (checked, including a relink of both
+  exes). Different zlib versions can compress differently; the unpacked files stay the
+  same.
+- **Nothing test-only ships:** the Wine harness (busybox, the cmd shim, the patched
+  zig copy in `packaging/windows/wine-zig/`) lives only in `packaging/windows/`.
+- **check_dist:** `python3 tools/check_dist.py CT_Recomp-win64.zip [--rom ROM]` reads
+  the zip and the archives inside it (Python's `python313.zip`). It also recognises a
+  Windows game module (a PE file whose export table names `ct_module_get`) under any
+  name or extension. The pinned zig.exe, Python and SDL2.dll need no allow-list entry.
+
+### Tests
+
+```
+packaging/windows/test-wine.sh OUT ctest      # ROM-free test set under Wine
+packaging/windows/test-wine.sh OUT module     # synthetic module with the bundled tools
+packaging/windows/test-wine.sh OUT rom ROM    # first-run build + 600 frames (needs your ROM)
+```
+
+These need podman (the Wine container is created on first use; nothing is installed on
+the host). Wine cannot run the unmodified `zig.exe`, so the `module` and `rom` modes use
+a patched *copy* of it (`packaging/windows/wine-zig/`); the package is untouched.
+
+### CI
+
+`.github/workflows/port.yml` has two Windows package jobs, with no ROM:
+
+- `windows-package` (ubuntu-latest): runs `build.sh`, then `check_dist.py` on the zip,
+  then uploads it as the `CT_Recomp-win64` artifact.
+- `windows-package-test` (windows-latest): downloads and unzips it, and with the package's
+  own `python\python.exe` and unmodified `zig\zig.exe` builds the synthetic module
+  (`tools\build_module.py --synth`, via `packaging/windows/synth/ci-module.bat`) and
+  loads it with the package's `ct_boot_engine.exe`. It prints `WIN-MODULE-OK`.

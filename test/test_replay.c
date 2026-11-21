@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "harness.h"
+#include "platform.h"   /* port: ct_tmpdir */
 #include "replay.h"
 
 static uint16_t pattern(long f)
@@ -30,7 +31,8 @@ int main(int argc, char **argv)
           "malformed specs rejected");
     replay_free(&r);
 
-    char path[] = "/tmp/ct_replay_XXXXXX";
+    char path[4096];
+    snprintf(path, sizeof path, "%s/ct_replay_XXXXXX", ct_tmpdir());
     int fd = mkstemp(path);
     CHECK(fd >= 0, "temp file");
     close(fd);

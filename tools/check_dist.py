@@ -23,8 +23,10 @@ A file fails the check if
     name). Packs dumped from the game hold its art, and audio packs most
     often recordings of its music; they are for personal use and never
     ship;
-  - it is an ELF file that exports ct_module_get: a game module, even
-    renamed and stripped (runtime/module.h);
+  - it is an ELF file or a Windows PE file (.dll, .exe, .pyd, any name)
+    that exports ct_module_get: a game module, even renamed and stripped
+    (runtime/module.h). The engine's own programs only look the name up
+    (GetProcAddress/dlsym) and do not export it, so they pass;
   - it contains a generated function's name (f_XXXXXX_mNxN: the symbols
     and strings the translator emits);
   - it contains a 64-byte window of the ROM. The ROM is sampled: about
@@ -61,7 +63,7 @@ import zipfile
 WINDOW = 64
 BANK = 0x10000
 MIN_DISTINCT = 16
-GENERATED_NAMES = ('ct_game*.so', 'ct_game*.so.*', 'bank*.c', 'ct_funcs.c', 'ct_overlays.c')
+GENERATED_NAMES = ('ct_game*.so', 'ct_game*.so.*', 'ct_game*.dll', 'bank*.c', 'ct_funcs.c', 'ct_overlays.c')
 SYMBOL_RE = re.compile(rb'f_[0-9A-F]{6}_m[01]x[01]')
 MODULE_ENTRY = b'ct_module_get'   # runtime/module.h
 PACK_MANIFEST = 'pack.toml'       # asset packs (docs/ASSET-PACKS.md)
@@ -152,6 +154,54 @@ def elf_defines(data: bytes, symbol: bytes) -> bool:
     return False
 
 
+def pe_defines(data: bytes, symbol: bytes) -> bool:
+    """Whether data is a 64-bit PE file (.dll, .exe) whose export table names
+    symbol: a Windows game module, even renamed."""
+    if data[:2] != b'MZ' or len(data) < 0x40:
+        return False
+    def u(off: int, n: int) -> int:
+        return int.from_bytes(data[off:off + n], 'little')
+    pe = u(0x3C, 4)
+    if pe + 24 > len(data) or data[pe:pe + 4] != b'PE\0\0':
+        return False
+    nsec, optsize = u(pe + 6, 2), u(pe + 20, 2)
+    opt = pe + 24
+    if opt + optsize > len(data) or optsize < 112:
+        return False
+    magic = u(opt, 2)
+    dd = opt + (112 if magic == 0x20B else 96)   # PE32+ / PE32 data directories
+    if magic not in (0x10B, 0x20B) or dd + 8 > opt + optsize:
+        return False
+    exp_rva = u(dd, 4)
+    if not exp_rva:
+        return False
+    secs = opt + optsize
+    def rva2off(rva: int) -> int:
+        for k in range(nsec):
+            sh = secs + 40 * k
+            if sh + 40 > len(data):
+                break
+            va, raw_size, raw = u(sh + 12, 4), u(sh + 16, 4), u(sh + 20, 4)
+            vsize = u(sh + 8, 4)
+            if va <= rva < va + max(raw_size, vsize):
+                return raw + rva - va
+        return -1
+    e = rva2off(exp_rva)
+    if e < 0 or e + 40 > len(data):
+        return False
+    n_names, names_rva = u(e + 24, 4), u(e + 32, 4)
+    names = rva2off(names_rva)
+    if names < 0:
+        return False
+    for k in range(min(n_names, 100000)):
+        if names + 4 * k + 4 > len(data):
+            break
+        s = rva2off(u(names + 4 * k, 4))
+        if s >= 0 and data[s:s + len(symbol) + 1] == symbol + b'\0':
+            return True
+    return False
+
+
 class Checker:
     def __init__(self, samples: RomSamples | None, quiet: bool, allow: dict[str, str] | None = None):
         self.samples = samples
@@ -187,7 +237,7 @@ class Checker:
                                                   data[:4] in PACK_AUDIO_MAGIC):
             self.fail(where, 'sound from an audio pack (packs are personal-use only, never '
                              'shipped)')
-        if elf_defines(data, MODULE_ENTRY):
+        if elf_defines(data, MODULE_ENTRY) or pe_defines(data, MODULE_ENTRY):
             self.fail(where, f'a game module (exports {MODULE_ENTRY.decode()})')
         m = SYMBOL_RE.search(data)
         if m:

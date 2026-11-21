@@ -18,6 +18,7 @@
 
 #include "bus.h"
 #include "settings.h"
+#include "platform.h"   /* port: Windows: rename that replaces, link, O_BINARY */
 
 #define PATHLEN 4096
 
@@ -144,7 +145,7 @@ static int write_atomic_to(const char *target, const uint8_t *data, int keep_bak
     char tmp[PATHLEN + 8], bak[PATHLEN + 8];
     snprintf(tmp, sizeof tmp, "%s.tmp", target);
     snprintf(bak, sizeof bak, "%s.bak", target);
-    int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
     if (fd < 0)
         return -1;
     size_t done = 0;

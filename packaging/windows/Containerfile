@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2026 jerbanpls
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Wine for the Windows package tests (packaging/windows/wine.sh). Wine lives
+# in this image only; nothing is installed on the host.
+FROM registry.fedoraproject.org/fedora:45
+RUN dnf -y install wine wine-core wine-common cabextract curl && dnf clean all
+# a TrueType font for the HD text test (test_hdtext; CT_TEST_FONT points at it)
+RUN dnf -y install dejavu-sans-fonts && dnf clean all
+RUN useradd -m wine
+USER wine
+ENV WINEPREFIX=/home/wine/prefix WINEDEBUG=-all WINEARCH=win64 \
+    SDL_VIDEODRIVER=dummy SDL_AUDIODRIVER=dummy DISPLAY=
+# a pre-initialised prefix (no display: wineboot runs headless)
+RUN wineboot -i 2>&1 | tail -3; wineserver -w; ls $WINEPREFIX/drive_c
+# A POSIX shell and the few tools the ctest set calls through system() and
+# popen() (sh, ls, grep, rm, mkdir): MSYS2 provides them on the Windows CI.
+# busybox-w32 (GPL-2.0, https://frippery.org/busybox/), test-time only, in
+# C:\bb, which ctest-wine.py puts on WINEPATH (never part of the package).
+# The URL always serves the newest build: if the hash stops matching, update it.
+RUN curl -fL --retry 3 -o /tmp/bb.exe https://frippery.org/files/busybox/busybox64u.exe \
+    && echo "36b266923fc5765b42f5f981319f39568498fba60b53ccf26e8fc1e575e2a9a9  /tmp/bb.exe" | sha256sum -c - \
+    && mkdir -p $WINEPREFIX/drive_c/bb \
+    && for t in sh ls grep rm mkdir; do cp /tmp/bb.exe $WINEPREFIX/drive_c/bb/$t.exe; done \
+    && rm /tmp/bb.exe
+# Wine does not pass SDL_* variables from the Linux environment on to Windows
+# programs: set the dummy drivers (no display, no sound) in the prefix itself.
+RUN for v in SDL_VIDEODRIVER SDL_AUDIODRIVER; do \
+        wine reg add 'HKCU\Environment' /v $v /d dummy /f; done; wineserver -w

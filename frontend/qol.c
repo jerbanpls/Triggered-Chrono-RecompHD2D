@@ -5,7 +5,6 @@
 #include "qol.h"
 
 #include <dirent.h>
-#include <dlfcn.h>
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -25,6 +24,7 @@
 #include "sched.h"
 #include "settings.h"   /* port: the menu's rows (qol_register_settings) */
 #include "pngio.h"      /* port: the save state thumbnails, for the menu */
+#include "platform.h"   /* port: ct_dlopen, ct_home; Windows renames (rename, mkdir...) */
 
 /* ---- settings (settings.ini; qol_setting) ---- */
 
@@ -200,7 +200,7 @@ static void slot_label(char *out, size_t n, int s)
 
 void qol_pictures_dir(char *out, size_t n)
 {
-    const char *home = getenv("HOME");
+    const char *home = ct_home();
     const char *v = getenv("XDG_PICTURES_DIR");
     char dir[4096] = "";
     if (v && *v) {
@@ -404,13 +404,13 @@ static void sleep_inhibit(void)
 
 static void sleep_watch_init(void)
 {
-    void *lib = dlopen("libdbus-1.so.3", RTLD_NOW | RTLD_LOCAL);
+    void *lib = ct_dlopen("libdbus-1.so.3");
     if (!lib) {
         fprintf(stderr, "ct_sdl: no libdbus: suspend not watched (the resume point is saved "
                         "on quit)\n");
         return;
     }
-#define SYM(field, name) *(void **)&dbus.field = dlsym(lib, name)
+#define SYM(field, name) *(void **)&dbus.field = ct_dlsym(lib, name)
     SYM(error_init, "dbus_error_init");
     SYM(error_free, "dbus_error_free");
     SYM(bus_get_private, "dbus_bus_get_private");

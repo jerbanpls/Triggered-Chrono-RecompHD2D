@@ -19,6 +19,7 @@
 #include "harness.h"
 #include "music.h"
 #include "wav.h"
+#include "platform.h"   /* port: Windows: mkdir with no mode, setenv */
 
 #define RATE 48000
 #define PI 3.14159265358979323846

@@ -20,7 +20,7 @@
  *   - swapcontext saves into its first argument and resumes the second;
  *   - no signal mask is saved or restored (glibc's calls make a
  *     sigprocmask system call each; the runtime never changes the mask).
- * Supported: aarch64 (AAPCS64) and x86_64 (System V).
+ * Supported: aarch64 (AAPCS64), x86_64 (System V) and 64-bit Windows (MinGW).
  */
 #ifndef CT_COMPAT_UCONTEXT_H
 #define CT_COMPAT_UCONTEXT_H
@@ -38,6 +38,10 @@
 #if defined(__aarch64__)
 /* x19-x28, x29 (fp), x30 (lr: where to resume), sp, d8-d15 */
 #define CT_UC_NREGS 21
+#elif defined(_WIN32) && defined(__x86_64__)
+/* rbx, rbp, rdi, rsi, r12-r15, rsp, rip, MXCSR and the x87 control word,
+   xmm6-xmm15 (two words each); ucontext_win32.c */
+#define CT_UC_NREGS 31
 #elif defined(__x86_64__)
 /* rbx, rbp, r12-r15, rsp, rip, MXCSR and the x87 control word */
 #define CT_UC_NREGS 9

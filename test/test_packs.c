@@ -16,6 +16,19 @@
 #include <unistd.h>
 #endif
 
+/* The shell commands below are sh's (mkdir -p, rm -rf); Windows' system()
+   runs cmd.exe, so there they go through sh (MSYS2's, on PATH). */
+#ifdef _WIN32
+static int run(const char *cmd)
+{
+    char b[4800];
+    snprintf(b, sizeof b, "sh -c \"%s\"", cmd);
+    return system(b);
+}
+#else
+#define run(cmd) system(cmd)
+#endif
+
 #include "music.h"
 #include "packs.h"
 #include "pngio.h"
@@ -285,7 +298,7 @@ static void test_dump_and_load(const char *tmp)
     char dir2[4096];
     snprintf(dir2, sizeof dir2, "%s/packs/hi", tmp);
     snprintf(path, sizeof path, "mkdir -p '%s/tiles'", dir2);
-    CHECK(system(path) == 0, "mkdir");
+    CHECK(run(path) == 0, "mkdir");
     static uint8_t big[32 * 32 * 4];
     memset(big, 0x7F, sizeof big);
     snprintf(path, sizeof path, "%s/tiles/x.png", dir2);
@@ -366,7 +379,7 @@ static void test_poses_and_keys(const char *tmp)
     char dir[4096], path[4200];
     snprintf(dir, sizeof dir, "%s/packs/poses", tmp);
     snprintf(path, sizeof path, "mkdir -p '%s'", dir);
-    CHECK(system(path) == 0, "mkdir");
+    CHECK(run(path) == 0, "mkdir");
     /* the pose: 32 x 16 console px at 4x; its right quarter transparent */
     static uint8_t img[128 * 64 * 4];
     for (int y = 0; y < 64; y++)
@@ -474,7 +487,7 @@ static void test_traversal(const char *tmp)
     snprintf(evil, sizeof evil, "%s/evil", root);
     snprintf(good, sizeof good, "%s/good", root);
     snprintf(cmd, sizeof cmd, "mkdir -p '%s/tiles' '%s/models' '%s/tiles'", evil, evil, good);
-    CHECK(system(cmd) == 0, "mkdir");
+    CHECK(run(cmd) == 0, "mkdir");
     static uint8_t px[8 * 8 * 4];
     memset(px, 0x55, sizeof px);
     snprintf(path, sizeof path, "%s/outside.png", root);
@@ -565,7 +578,7 @@ int main(int argc, char **argv)
     char tmp[4096], cmd[4200];
     snprintf(tmp, sizeof tmp, "%s/test_packs.d", argv[2]);
     snprintf(cmd, sizeof cmd, "rm -rf '%s' && mkdir -p '%s'", tmp, tmp);
-    if (system(cmd)) {
+    if (run(cmd)) {
         fprintf(stderr, "cannot make %s\n", tmp);
         return 2;
     }

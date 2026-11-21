@@ -11,11 +11,24 @@
 #include "func_table.h"
 #include "module.h"
 
+#ifdef _WIN32
+/* port: PE has no weak undefined references (the link fails on them), so
+   a Windows static build links no game scene, rumble hook, music watcher,
+   text or poses. Games reach a Windows engine as modules (module.c), whose
+   entry point (module_entry.c) is WIN-2's. */
+#define ct_game_scene NULL
+#define ct_game_rumble NULL
+#define ct_game_text NULL
+#define ct_game_pose NULL
+#define CT_NO_GAME_MUSIC
+#else
 __attribute__((weak)) int ct_game_scene(ct_scene *out);   /* NULL: none linked */
 __attribute__((weak)) int ct_game_rumble(long frame);      /* rumble.h; NULL: none */
 __attribute__((weak)) extern const ct_music_hooks ct_game_music;
 __attribute__((weak)) int ct_game_text(ct_text *out);
 __attribute__((weak)) int ct_game_pose(int obj, ct_scene_pose *out, uint8_t *rgba, int max);
+
+#endif
 
 __attribute__((constructor)) static void install_linked_tables(void)
 {
@@ -25,7 +38,11 @@ __attribute__((constructor)) static void install_linked_tables(void)
     ct_tables_install(&t);
     ct_scene_set_source(ct_game_scene);
     ct_rumble_set_source(ct_game_rumble);
+#ifdef CT_NO_GAME_MUSIC
+    ct_music_set_source(NULL);
+#else
     ct_music_set_source(&ct_game_music ? &ct_game_music : NULL);
+#endif
     ct_text_set_source(ct_game_text);
     ct_pose_set_source(ct_game_pose);
 }

@@ -37,6 +37,10 @@ with tempfile.TemporaryDirectory() as tmp:
     probe = os.path.join(tmp, "probe")
     open(probe, "w").write(FAKE)
     os.chmod(probe, os.stat(probe).st_mode | stat.S_IEXEC)
+    if os.name == "nt":   # no shebangs: a .bat that runs the script with this Python
+        with open(probe + ".bat", "w") as f:
+            f.write(f'@"{sys.executable}" "{probe}" %*\r\n')
+        probe += ".bat"
     r = subprocess.run([sys.executable, TOOL, probe, "--frames", "10"], capture_output=True,
                        text=True)
     if r.returncode != 0 or "10 frames identical" not in r.stdout:

@@ -14,6 +14,7 @@
 
 #include "device.h"
 #include "input.h"
+#include "platform.h"   /* port: Windows: mkdir with no mode, setenv */
 
 static long checks, fails;
 #define CHECK(c, ...)                                                    \

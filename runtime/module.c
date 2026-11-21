@@ -4,10 +4,10 @@
  * Game module loader (module.h). */
 #include "module.h"
 
-#include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
 
+#include "platform.h"   /* port: ct_dlopen (Windows has no dlopen) */
 #include "ppu.h"
 #include "snes_adapter.h"
 
@@ -90,19 +90,19 @@ int ct_text_capture(ct_text *out)
 int ct_module_load(const char *path, const char **err)
 {
     static char msg[512];
-    void *h = dlopen(path, RTLD_NOW | RTLD_LOCAL);
+    void *h = ct_dlopen(path);
     if (!h) {
-        snprintf(msg, sizeof msg, "%s", dlerror());
+        snprintf(msg, sizeof msg, "%s", ct_dlerror());
         *err = msg;
         return -1;
     }
-    void *sym = dlsym(h, "ct_module_get");
+    void *sym = ct_dlsym(h, "ct_module_get");
     ct_module_get_fn get;
     memcpy(&get, &sym, sizeof get);   /* object -> function pointer */
     if (!get) {
         snprintf(msg, sizeof msg, "%s: no ct_module_get (not a game module)", path);
         *err = msg;
-        dlclose(h);
+        ct_dlclose(h);
         return -1;
     }
     const ct_module_info *m = get();
@@ -113,7 +113,7 @@ int ct_module_load(const char *path, const char **err)
         snprintf(msg, sizeof msg, "%s: built for a different engine (module ABI %u, engine %u)",
                  path, m ? m->abi : 0, CT_MODULE_ABI);
         *err = msg;
-        dlclose(h);
+        ct_dlclose(h);
         return -1;
     }
     ct_tables_install(&m->tables);   /* the module stays loaded for good */
@@ -122,7 +122,7 @@ int ct_module_load(const char *path, const char **err)
     ct_music_set_source(m->music);
     ct_text_set_source(m->text);
     /* Optional, outside ct_module_info: poses (a module without them is fine). */
-    sym = dlsym(h, "ct_module_pose");
+    sym = ct_dlsym(h, "ct_module_pose");
     ct_module_pose_fn pose = NULL;
     memcpy(&pose, &sym, sizeof pose);
     ct_pose_set_source(pose);

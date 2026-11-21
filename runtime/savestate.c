@@ -15,6 +15,7 @@
 #include "module.h"
 #include "sched.h"
 #include "sha1.h"
+#include "platform.h"   /* port: Windows: rename that replaces, O_BINARY */
 
 static void put32(uint8_t *b, uint32_t v)
 {
@@ -174,7 +175,7 @@ int savestate_write_file(const char *path, const char **why)
         return -1;
     char tmp[4096 + 8];
     snprintf(tmp, sizeof tmp, "%s.tmp", path);
-    int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    int fd = open(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
     size_t done = 0;
     while (fd >= 0 && done < len) {
         ssize_t n = write(fd, blob + done, len - done);

@@ -14,8 +14,16 @@
 #include "harness.h"
 #include "input.h"
 #include "qol.h"
+#include "platform.h"   /* port: Windows: mkdir with no mode, setenv */
 
 static char tmp[4096];
+
+/* sysfs's name has a colon, which Windows doesn't allow in a file name */
+#ifdef _WIN32
+#define UCSI_NAME "ucsi-source-psy-USBC000-001"
+#else
+#define UCSI_NAME "ucsi-source-psy-USBC000:001"
+#endif
 
 static void put(const char *dir, const char *name, const char *file, const char *text)
 {
@@ -47,8 +55,8 @@ static void test_battery(void)
     put(d, "ACAD", "online", "0\n");
     CHECK(qol_on_battery(d) == 1, "qol_on_battery(d) == 1");
     /* a USB-C charger (Steam Deck, Ally) counts as outside power */
-    put(d, "ucsi-source-psy-USBC000:001", "type", "USB\n");
-    put(d, "ucsi-source-psy-USBC000:001", "online", "1\n");
+    put(d, UCSI_NAME, "type", "USB\n");
+    put(d, UCSI_NAME, "online", "1\n");
     CHECK(qol_on_battery(d) == 0, "qol_on_battery(d) == 0");
     /* a desktop: no battery at all */
     snprintf(d, sizeof d, "%s/desk", tmp);
@@ -147,8 +155,7 @@ static void test_rect(void)
 
 int main(void)
 {
-    const char *t = getenv("TMPDIR");
-    snprintf(tmp, sizeof tmp, "%s/ct_test_qol_XXXXXX", t && *t ? t : "/tmp");
+    snprintf(tmp, sizeof tmp, "%s/ct_test_qol_XXXXXX", ct_tmpdir());
     CHECK(mkdtemp(tmp) != NULL, "mkdtemp(tmp) != NULL");
     test_battery();
     test_pictures();

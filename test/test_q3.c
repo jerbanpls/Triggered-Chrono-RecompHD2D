@@ -20,6 +20,7 @@
 #include "saves.h"
 #include "settings.h"
 #include "touch.h"
+#include "platform.h"   /* port: Windows: mkdir with no mode, setenv */
 
 static char tmp[4096];
 static time_t now;
@@ -403,8 +404,7 @@ static void test_settings(void)
 
 int main(void)
 {
-    const char *t = getenv("TMPDIR");
-    snprintf(tmp, sizeof tmp, "%s/ct_test_q3_XXXXXX", t && *t ? t : "/tmp");
+    snprintf(tmp, sizeof tmp, "%s/ct_test_q3_XXXXXX", ct_tmpdir());
     CHECK(mkdtemp(tmp) != NULL, "mkdtemp");
     test_backups();
     test_overlays();

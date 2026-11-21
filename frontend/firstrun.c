@@ -3,8 +3,8 @@
  *
  * First run of an engine-only build (firstrun.h). Everything game-specific
  * comes from DATA_DIR/game/GAME_ID/game.toml: the title shown, the ROM's
- * size and its SHA-1. POSIX only, like the module loader (fork, exec,
- * pipes). */
+ * size and its SHA-1. The build tool runs as a child process on a pipe:
+ * fork and exec on POSIX, CreateProcess on Windows (child_*). */
 #include "firstrun.h"
 
 #include <dirent.h>
@@ -15,10 +15,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
 #include <unistd.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <strings.h>
+#include <sys/wait.h>
+#endif
 
 #include <SDL.h>
 
@@ -28,6 +32,7 @@
 #include "hid_deck.h"   /* port: InputPlumber's Deck pad */
 #include "module.h"
 #include "sched.h"
+#include "platform.h"   /* port: ct_home; Windows: realpath, rename... */
 #include "sha1.h"
 
 #define W SCHED_WIDTH
@@ -272,12 +277,197 @@ static int read_game_toml(const char *path)
 
 /* ---- child processes ---- */
 
+#ifdef _WIN32
+/* The folder of the running exe (UTF-8, no trailing separator) and the
+   exe's own file name: the package is unpacked anywhere, and its Python and
+   zig sit next to the exe, so nothing needs PATH. */
+static char exe_dir[PATHLEN], exe_file[128];
+
+static void exe_init(void)
+{
+    wchar_t w[MAX_PATH * 2];
+    char u[PATHLEN];
+    DWORD n = GetModuleFileNameW(NULL, w, (DWORD)(sizeof w / sizeof w[0]));
+    exe_dir[0] = exe_file[0] = 0;
+    if (!n || n >= sizeof w / sizeof w[0] ||
+        !WideCharToMultiByte(CP_UTF8, 0, w, -1, u, (int)sizeof u, NULL, NULL))
+        return;
+    char *sep = strrchr(u, '\\');
+    if (!sep)
+        return;
+    snprintf(exe_file, sizeof exe_file, "%s", sep + 1);
+    *sep = 0;
+    snprintf(exe_dir, sizeof exe_dir, "%s", u);
+}
+
+/* %USERPROFILE% (not $HOME, which only MSYS shells set). */
+static const char *home_dir(void)
+{
+    const char *h = getenv("USERPROFILE");
+    return h && *h ? h : ct_home();
+}
+
+/* File name part of a path: either kind of separator on Windows. */
+static const char *base_name(const char *path)
+{
+    const char *a = strrchr(path, '/'), *b = strrchr(path, '\\');
+    return a && b ? (a > b ? a : b) + 1 : a ? a + 1 : b ? b + 1 : path;
+}
+
+/* "<exe dir>\<rel>" if that file exists, else NULL. */
+static const char *bundled(char *out, size_t n, const char *rel)
+{
+    if (!exe_dir[0])
+        return NULL;
+    snprintf(out, n, "%s\\%s", exe_dir, rel);
+    return access(out, F_OK) == 0 ? out : NULL;
+}
+#else
+static const char *base_name(const char *path)
+{
+    const char *a = strrchr(path, '/');
+    return a ? a + 1 : path;
+}
+#endif
+
+#ifdef _WIN32
+/* ct_sdl_engine.exe is a GUI program (no console window for players). Started
+   from a console or with its output redirected (--frames test runs), it keeps
+   that output; started from the Explorer, its standard handles are not valid
+   and what would go to stdout and stderr goes to ct_sdl.log in the
+   preferences folder instead (%APPDATA%\\ct-recomp\\GAME\\). */
+void firstrun_log_redirect(const char *game)
+{
+    HANDLE h = GetStdHandle(STD_ERROR_HANDLE);
+    if (h && h != INVALID_HANDLE_VALUE && GetFileType(h) != FILE_TYPE_UNKNOWN)
+        return;
+    char *pref = SDL_GetPrefPath("ct-recomp", game);
+    if (!pref)
+        return;
+    char path[4096];
+    snprintf(path, sizeof path, "%sct_sdl.log", pref);
+    SDL_free(pref);
+    FILE *f = freopen(path, "w", stderr);
+    if (f)
+        setvbuf(stderr, NULL, _IONBF, 0);
+    if (freopen(path, "a", stdout))
+        setvbuf(stdout, NULL, _IOLBF, 0);
+}
+#endif
+
 static const char *python(void)
 {
     const char *p = getenv("CT_PYTHON");
-    return p && *p ? p : "python3";
+    if (p && *p)
+        return p;
+#ifdef _WIN32
+    static char b[PATHLEN];
+    const char *bp = bundled(b, sizeof b, "python\\python.exe");
+    return bp ? bp : "python";   /* not bundled: python.org and the Store install python, not python3 */
+#else
+    return "python3";
+#endif
 }
 
+#ifdef _WIN32
+typedef struct {
+    HANDLE proc;
+    HANDLE rd;
+    char buf[2048];
+    size_t len;
+} child;
+
+/* argv as one command line, each argument quoted by the rules of
+   CommandLineToArgvW (backslashes only count before a quote). */
+static int cmdline(char *out, size_t n, char *const argv[])
+{
+    size_t o = 0;
+#define PUT(ch) do { if (o + 1 >= n) return -1; out[o++] = (ch); } while (0)
+    for (int k = 0; argv[k]; k++) {
+        if (k)
+            PUT(' ');
+        PUT('"');
+        size_t bs = 0;
+        for (const char *a = argv[k]; *a; a++) {
+            if (*a == '\\') {
+                bs++;
+                continue;
+            }
+            if (*a == '"')
+                bs = bs * 2 + 1;
+            for (; bs; bs--)
+                PUT('\\');
+            PUT(*a);
+        }
+        for (bs *= 2; bs; bs--)
+            PUT('\\');
+        PUT('"');
+    }
+#undef PUT
+    out[o] = 0;
+    return 0;
+}
+
+/* Start argv with its stdout and stderr on a pipe. */
+static int child_start(child *c, char *const argv[])
+{
+    char line[8192];
+    if (cmdline(line, sizeof line, argv))
+        return -1;
+    SECURITY_ATTRIBUTES sa = {sizeof sa, NULL, TRUE};
+    HANDLE rd, wr;
+    if (!CreatePipe(&rd, &wr, &sa, 0))
+        return -1;
+    SetHandleInformation(rd, HANDLE_FLAG_INHERIT, 0);
+    STARTUPINFOA si;
+    memset(&si, 0, sizeof si);
+    si.cb = sizeof si;
+    si.dwFlags = STARTF_USESTDHANDLES;
+    si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    si.hStdOutput = wr;
+    si.hStdError = wr;
+    PROCESS_INFORMATION pi;
+    BOOL ok = CreateProcessA(NULL, line, NULL, NULL, TRUE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+    CloseHandle(wr);
+    if (!ok) {
+        CloseHandle(rd);
+        return -1;
+    }
+    CloseHandle(pi.hThread);
+    c->proc = pi.hProcess;
+    c->rd = rd;
+    c->len = 0;
+    return 0;
+}
+
+/* Bytes read, 0 at the end of the output, -1 when none are ready yet. */
+static long child_recv(child *c, char *buf, size_t n)
+{
+    DWORD avail = 0, got = 0;
+    if (!PeekNamedPipe(c->rd, NULL, 0, NULL, &avail, NULL))
+        return 0;   /* the child and its handles are gone: the end */
+    if (!avail)
+        return -1;
+    if (!ReadFile(c->rd, buf, avail < n ? avail : (DWORD)n, &got, NULL))
+        return 0;
+    return (long)got;
+}
+
+static void child_kill(child *c)
+{
+    TerminateProcess(c->proc, 1);
+}
+
+static int child_wait(child *c)
+{
+    DWORD code = 1;
+    CloseHandle(c->rd);
+    WaitForSingleObject(c->proc, INFINITE);
+    GetExitCodeProcess(c->proc, &code);
+    CloseHandle(c->proc);
+    return (int)code;
+}
+#else
 typedef struct {
     pid_t pid;
     int fd;
@@ -317,15 +507,39 @@ static int child_start(child *c, char *const argv[])
     return 0;
 }
 
+/* Bytes read, 0 at the end of the output, -1 when none are ready yet. */
+static long child_recv(child *c, char *buf, size_t n)
+{
+    ssize_t r = read(c->fd, buf, n);
+    if (r < 0)
+        return errno == EAGAIN || errno == EINTR ? -1 : 0;
+    return (long)r;
+}
+
+static void child_kill(child *c)
+{
+    kill(c->pid, SIGTERM);
+}
+
+static int child_wait(child *c)
+{
+    int st = 0;
+    close(c->fd);
+    while (waitpid(c->pid, &st, 0) < 0 && errno == EINTR)
+        ;
+    return WIFEXITED(st) ? WEXITSTATUS(st) : 128 + (WIFSIGNALED(st) ? WTERMSIG(st) : 0);
+}
+#endif
+
 /* Hand each complete line read so far to on_line. Returns 1 at EOF. */
 static int child_read(child *c, void (*on_line)(char *))
 {
     for (;;) {
         if (c->len >= sizeof c->buf - 1)   /* can't happen (flushed below); keeps the size sane */
             c->len = 0;
-        ssize_t n = read(c->fd, c->buf + c->len, sizeof c->buf - 1 - c->len);
+        long n = child_recv(c, c->buf + c->len, sizeof c->buf - 1 - c->len);
         if (n < 0)
-            return errno == EAGAIN || errno == EINTR ? 0 : 1;
+            return 0;
         int eof = n == 0;
         c->len += (size_t)n;
         char *start = c->buf, *nl;
@@ -346,15 +560,6 @@ static int child_read(child *c, void (*on_line)(char *))
     }
 }
 
-static int child_wait(child *c)
-{
-    int st = 0;
-    close(c->fd);
-    while (waitpid(c->pid, &st, 0) < 0 && errno == EINTR)
-        ;
-    return WIFEXITED(st) ? WEXITSTATUS(st) : 128 + (WIFSIGNALED(st) ? WTERMSIG(st) : 0);
-}
-
 static void log_line(char *line)
 {
     fprintf(stderr, "ct_sdl: %s\n", line);
@@ -368,7 +573,7 @@ static char rom_sha1[41];
 static int check_rom(const char *path, char *why, size_t n)
 {
     char base[128];   /* the file name, enough to recognize it */
-    snprintf(base, sizeof base, "%.127s", strrchr(path, '/') ? strrchr(path, '/') + 1 : path);
+    snprintf(base, sizeof base, "%.127s", base_name(path));
     struct stat st;
     if (stat(path, &st) || !S_ISREG(st.st_mode)) {
         snprintf(why, n, "Not a file: %s", base);
@@ -470,8 +675,13 @@ static void scan_add(const char *a, const char *b)
     char d[PATHLEN];
     snprintf(d, sizeof d, "%s%s", a, b ? b : "");
     size_t l = strlen(d);
+#ifdef _WIN32
+    while (l > 3 && (d[l - 1] == '/' || d[l - 1] == '\\'))   /* (C:\ keeps its slash) */
+        d[--l] = 0;
+#else
     while (l > 1 && d[l - 1] == '/')
         d[--l] = 0;
+#endif
     for (int k = 0; k < n_scan_dirs; k++)
         if (!strcmp(scan_dir[k], d))
             return;
@@ -480,9 +690,23 @@ static void scan_add(const char *a, const char *b)
 
 static void scan_dirs_init(void)
 {
-    const char *home = getenv("HOME");
     n_scan_dirs = 0;
     scan_app = -1;
+#ifdef _WIN32
+    /* The user's Documents and Downloads, then the folder of the exe. */
+    const char *home = home_dir();
+    scan_add(home, "\\Documents");
+    scan_add(home, "\\Downloads");
+    if (exe_dir[0]) {
+        int before = n_scan_dirs;
+        scan_add(exe_dir, NULL);
+        if (n_scan_dirs > before)
+            scan_app = before;
+    }
+    scan_add(pref, NULL);
+    return;
+#else
+    const char *home = ct_home();
     scan_add(getenv("XDG_DOCUMENTS_DIR"), NULL);
     scan_add(home, "/Documents");
     scan_add(getenv("XDG_DOWNLOAD_DIR"), NULL);
@@ -497,6 +721,7 @@ static void scan_dirs_init(void)
             scan_app = before;
     }
     scan_add(pref, NULL);
+#endif
 }
 
 /* Files already hashed and rejected, so a rescan doesn't read them again. */
@@ -532,6 +757,17 @@ static int scan_tree(const char *dir, int depth, scan_state *st, char *found, si
         if (lstat(path, &ls))
             continue;
         if (S_ISDIR(ls.st_mode)) {   /* not through symlinks: no loops */
+#ifdef _WIN32
+            /* the package's own folders (zig alone holds thousands of files) */
+            static const char *const own[] = {"python", "zig", "tools", "runtime", "game",
+                                              "recomp", "licenses"};
+            int skip = 0;
+            if (!depth && exe_dir[0] && !strcmp(dir, exe_dir))
+                for (size_t k = 0; k < sizeof own / sizeof own[0]; k++)
+                    skip |= !strcasecmp(e->d_name, own[k]);
+            if (skip)
+                continue;
+#endif
             if (depth < SCAN_DEPTH)
                 hit = scan_tree(path, depth + 1, st, found, n);
             continue;
@@ -629,12 +865,16 @@ static int wait_for_drop(char *path, size_t n, const char *problem)
         scr_clear("No ROM found. Put your ROM file in:", C_TEXT);
         /* The folders, short: relative to the home folder (the font has
            no ~). The last one, the per-game folder, isn't shown. */
-        const char *home = getenv("HOME");
+#ifdef _WIN32
+        const char *home = home_dir();
+#else
+        const char *home = ct_home();
+#endif
         size_t hl = home ? strlen(home) : 0;
         char where[1024] = "", app[PATHLEN] = "";
         for (int k = 0; k < n_scan_dirs - 1; k++) {
             const char *d = scan_dir[k];
-            if (hl && !strncmp(d, home, hl) && (d[hl] == '/' || !d[hl]))
+            if (hl && !strncmp(d, home, hl) && (d[hl] == '/' || d[hl] == '\\' || !d[hl]))
                 d = d[hl] ? d + hl + 1 : "the home folder";
             if (k == scan_app)
                 snprintf(app, sizeof app, "%s", d);
@@ -644,15 +884,20 @@ static int wait_for_drop(char *path, size_t n, const char *problem)
         }
         /* Long paths would push the rest off the screen: name the last
            folder only. */
-        if (app[0] && strlen(app) > COLS - 28 && strrchr(app, '/'))
-            memmove(app, strrchr(app, '/') + 1, strlen(strrchr(app, '/')));
+        if (app[0] && strlen(app) > COLS - 28 && base_name(app) != app)
+            memmove(app, base_name(app), strlen(base_name(app)) + 1);
         scr_add(C_TITLE, "  %s", where);
         if (home && hl <= COLS - 24)
             scr_add(C_DIM, "  in your home folder, %s", home);
         else
             scr_add(C_DIM, "  in your home folder");
+#ifdef _WIN32
+        if (app[0])
+            scr_add(C_TITLE, "  or next to ct_sdl_engine.exe, in %s", app);
+#else
         if (app[0])
             scr_add(C_TITLE, "  or next to the AppImage, in %s", app);
+#endif
         scr_line(C_TEXT, "");
         scr_add(C_DIM, "%s, headerless, %ld bytes, SHA-1:", game.name, game.rom_size);
         scr_add(C_DIM, "%s", game.sha1[0] ? game.sha1 : "(checked by tools/check_rom.py)");
@@ -660,7 +905,7 @@ static int wait_for_drop(char *path, size_t n, const char *problem)
         if (headered[0]) {
             scr_line(C_TEXT, "");
             scr_add(C_BAD, "%s has a 512-byte copier header: remove it.",
-                    strrchr(headered, '/') + 1);
+                    base_name(headered));
         } else if (why[0]) {
             scr_line(C_TEXT, "");
             scr_add(C_BAD, "%s", why);
@@ -772,10 +1017,28 @@ static int build(const char *rom)
     snprintf(gdir, sizeof gdir, "%s/game/%s", opt->data_dir, opt->game_id);
     snprintf(out, sizeof out, "%s", pref);
     size_t ol = strlen(out);
-    if (ol > 1 && out[ol - 1] == '/')
+    if (ol > 1 && (out[ol - 1] == '/' || out[ol - 1] == '\\'))
         out[ol - 1] = 0;
+#ifdef _WIN32
+    /* The C compiler is the package's zig (CT_ZIG overrides) and the module
+       links against the import library of this very exe: a module binds to
+       the program's name (libct_sdl_engine.dll.a for ct_sdl_engine.exe). */
+    static char zigbuf[PATHLEN], cc[PATHLEN + 64], implib[PATHLEN];
+    const char *zig = getenv("CT_ZIG");
+    if (!zig || !*zig)
+        zig = bundled(zigbuf, sizeof zigbuf, "zig\\zig.exe");
+    snprintf(cc, sizeof cc, "\"%s\" cc -target x86_64-windows-gnu", zig ? zig : "zig");
+    char stem[128];
+    snprintf(stem, sizeof stem, "%s", exe_file);
+    if (strrchr(stem, '.'))
+        *strrchr(stem, '.') = 0;
+    snprintf(implib, sizeof implib, "%s\\lib%s.dll.a", exe_dir, stem[0] ? stem : "ct_sdl_engine");
+    char *argv[] = {(char *)python(), "-u", script, "--game", gdir, "--rom", (char *)rom,
+                    "--out", out, "--native", "--cc", cc, "--engine-lib", implib, NULL};
+#else
     char *argv[] = {(char *)python(), "-u", script, "--game", gdir, "--rom", (char *)rom,
                     "--out", out, "--native", NULL};
+#endif
     n_steps = n_tail = 0;
     stamp_write(0);
     fprintf(stderr, "ct_sdl: building the game module: %s %s --game %s --rom %s --out %s "
@@ -783,7 +1046,11 @@ static int build(const char *rom)
     child c;
     if (access(script, R_OK) || child_start(&c, argv)) {
         on_build_line(access(script, R_OK) ? "the build tool is missing: tools/build_module.py"
+#ifdef _WIN32
+                                           : "cannot start python\\python.exe from this folder (set CT_PYTHON)");
+#else
                                            : "cannot start the build tool");
+#endif
         return 1;
     }
     Uint32 t0 = SDL_GetTicks();
@@ -793,7 +1060,7 @@ static int build(const char *rom)
         pump(&e);
         SDL_free(e.drop);
         if (e.quit) {
-            kill(c.pid, SIGTERM);
+            child_kill(&c);
             child_wait(&c);
             return FIRSTRUN_QUIT;
         }
@@ -850,6 +1117,24 @@ int firstrun(const firstrun_opts *o)
 {
     opt = o;
     char toml[PATHLEN];
+#ifdef _WIN32
+    /* The data folder is given relative to the exe ("."): the package can be
+       unpacked anywhere. */
+    static firstrun_opts abs_opts;
+    static char data[PATHLEN];
+    exe_init();
+    abs_opts = *o;
+    const char *dd = o->data_dir;
+    if (exe_dir[0] && dd && *dd && dd[0] != '/' && dd[0] != '\\' && !(dd[0] && dd[1] == ':')) {
+        snprintf(data, sizeof data, "%s\\%s", exe_dir, strcmp(dd, ".") ? dd : "");
+        size_t dl = strlen(data);
+        if (dl && data[dl - 1] == '\\')
+            data[dl - 1] = 0;
+        abs_opts.data_dir = data;
+        opt = &abs_opts;
+        o = opt;
+    }
+#endif
     snprintf(toml, sizeof toml, "%s/game/%s/game.toml", o->data_dir, o->game_id);
     if (read_game_toml(toml) || !game.rom_size) {
         fprintf(stderr, "ct_sdl: no game description at %s (--data-dir DIR, --game ID)\n", toml);
@@ -897,7 +1182,7 @@ int firstrun(const firstrun_opts *o)
             fprintf(stderr, "ct_sdl: ROM (found): %s\n", rom);
         } else if (headered[0] && !problem[0]) {
             snprintf(problem, sizeof problem, "%s has a 512-byte copier header: remove it.",
-                     strrchr(headered, '/') + 1);
+                     base_name(headered));
         }
     }
     if (!found && o->build_only) {
@@ -923,7 +1208,11 @@ int firstrun(const firstrun_opts *o)
     /* The module: reuse it if fresh, else build it; a fresh one that won't
        load is rebuilt once. */
     char module[PATHLEN];
+#ifdef _WIN32
+    pref_file(module, sizeof module, "ct_game.dll");   /* tools/build_module.py's name on Windows */
+#else
     pref_file(module, sizeof module, "ct_game.so");
+#endif
     int result = FIRSTRUN_MODULE;
     for (int attempt = 0;; attempt++) {
         int fresh = module_fresh(module);

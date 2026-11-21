@@ -13,7 +13,7 @@
  * Only used where the C library has no makecontext; glibc builds use
  * glibc's unless -DCT_COMPAT_UCONTEXT=ON forces this one (for testing).
  */
-#if defined(CT_COMPAT_UCONTEXT) && defined(__x86_64__)
+#if defined(CT_COMPAT_UCONTEXT) && defined(__x86_64__) && !defined(_WIN32)
 
 #include "ucontext.h"
 

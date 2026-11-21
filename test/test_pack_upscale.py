@@ -6,6 +6,7 @@ trip, the scaler (sizes, flat areas and transparency kept, a diagonal
 smoothed), a whole pack upscaled to a new directory, and --external
 with an "upscaler" that loses the alpha channel."""
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -99,7 +100,7 @@ def main():
         dst2 = os.path.join(td, 'packs', 'pe')
         r = subprocess.run([sys.executable, os.path.join(TOOLS, 'pack_upscale.py'), src, '--scale', '2',
                             '--out', dst2, '--jobs', '1', '--external',
-                            f'{sys.executable} {ext} {{in}} {{out}} {{scale}}'], capture_output=True, text=True)
+                            f'{shlex.quote(sys.executable)} {shlex.quote(ext)} {{in}} {{out}} {{scale}}'], capture_output=True, text=True)
         check(r.returncode == 0, f'--external: {r.stderr}')
         W, H, out = pu.png_read(os.path.join(dst2, 'tiles', '0000000000000001.png'))
         check((W, H) == (24, 24), '--external size')

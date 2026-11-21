@@ -6,3 +6,7 @@
 # Each entry: the file's SHA-256, then why it is safe. Add an entry only for an
 # unmodified upstream binary whose source is pinned in packaging/.
 2858dc89dbbfdd08cceda1b841e7fd0a793a1a67b49f150bc3d0d1de44ed7f51 zig 0.15.2 x86_64 compiler (official tarball, pinned in packaging/); its 256-byte bit-reversal table also appears in the ROM
+# Windows package (packaging/windows/build.sh): no entry needed. The pinned
+# zig-x86_64-windows-0.15.2 zip (zig.exe), the embeddable Python 3.13 and SDL2.dll
+# were scanned with --rom (6,714 files, 0 hits; the generic-table skip covers
+# zig's bit-reversal table). Add a hash here only if a future pin matches by chance.
