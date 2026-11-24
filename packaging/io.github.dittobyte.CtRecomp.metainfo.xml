@@ -23,8 +23,8 @@ SPDX-License-Identifier: FSFAP
       your machine, into your own data folder.
     </p>
   </description>
-  <url type="homepage">https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D</url>
-  <url type="bugtracker">https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/issues</url>
+  <url type="homepage">https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D</url>
+  <url type="bugtracker">https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/issues</url>
   <launchable type="desktop-id">io.github.dittobyte.CtRecomp.desktop</launchable>
   <provides>
     <binary>ct-recomp</binary>

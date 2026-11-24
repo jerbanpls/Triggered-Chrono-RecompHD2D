@@ -21,7 +21,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 - **Saves:** in-game saves now persist, in `~/.local/share/ct-recomp/ct/ct.srm`.
 
 ### GitHub repo: created, waiting on one step from you
-- **Created:** https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D (private when this
+- **Created:** https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D (private when this
   entry was written; now public). It was still empty then.
 - **Why:** the push of `main` was refused. Your `gh` token has the `repo` scope but not
   `workflow`, and GitHub won't accept commits containing `.github/workflows/` without it.
