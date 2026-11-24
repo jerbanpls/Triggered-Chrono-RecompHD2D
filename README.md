@@ -8,7 +8,7 @@ Linux first, Steam Deck and ROG Ally tuned, Windows and Android on the way.
 
 [![ci](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml/badge.svg)](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml)
 [![port](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml/badge.svg)](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml)
-[![release](https://img.shields.io/github/v/release/Dittobyte/Triggered-Chrono-RecompHD2D?include_prereleases&label=latest)](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/releases)
+[![release](https://img.shields.io/github/v/release/jerbanpls/Triggered-Chrono-RecompHD2D?include_prereleases&label=latest)](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/releases)
 
 > **Not affiliated.** This project is not affiliated with, authorized by or endorsed by the rights holders of
 > Chrono Trigger. Game and company names are trademarks of their respective owners and are used only to say what

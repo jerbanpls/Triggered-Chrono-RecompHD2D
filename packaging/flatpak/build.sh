@@ -35,6 +35,6 @@ if [ $# -eq 0 ]; then
     set -- --user --force-clean --repo=build-flatpak-repo build-flatpak
 fi
 if command -v flatpak-builder >/dev/null 2>&1; then
-    exec flatpak-builder "$@" packaging/flatpak/io.github.dittobyte.CtRecomp.yml
+    exec flatpak-builder "$@" packaging/flatpak/io.github.jerbanpls.CtRecomp.yml
 fi
-exec flatpak run org.flatpak.Builder "$@" packaging/flatpak/io.github.dittobyte.CtRecomp.yml
+exec flatpak run org.flatpak.Builder "$@" packaging/flatpak/io.github.jerbanpls.CtRecomp.yml

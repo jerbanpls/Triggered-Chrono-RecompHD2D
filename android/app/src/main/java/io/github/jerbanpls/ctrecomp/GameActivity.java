@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2026 jerbanpls
 // SPDX-License-Identifier: GPL-3.0-or-later
-package io.github.dittobyte.ctrecomp;
+package io.github.jerbanpls.ctrecomp;
 
 import java.io.File;
 

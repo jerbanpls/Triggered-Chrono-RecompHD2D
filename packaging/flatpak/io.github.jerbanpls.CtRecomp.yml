@@ -11,9 +11,9 @@
 # It holds no game code or data: the engine is built with CT_ENGINE_ONLY,
 # from the committed sources only (`git archive HEAD`, so neither rom/ nor
 # any build tree is ever copied in). On first use the user's own ROM is turned
-# into a game module in ~/.var/app/io.github.dittobyte.CtRecomp/data, with
+# into a game module in ~/.var/app/io.github.jerbanpls.CtRecomp/data, with
 # the runtime's python3 and the bundled zig.
-app-id: io.github.dittobyte.CtRecomp
+app-id: io.github.jerbanpls.CtRecomp
 runtime: org.freedesktop.Platform
 runtime-version: '25.08'
 sdk: org.freedesktop.Sdk

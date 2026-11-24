@@ -73,7 +73,7 @@ The Flatpak isn't on Flathub. Build and install it from the source tree as descr
 
 ```
 flatpak install --user ct-recomp.flatpak
-flatpak run io.github.dittobyte.CtRecomp
+flatpak run io.github.jerbanpls.CtRecomp
 ```
 
 After that, it also appears in your desktop's application menu as **CT Recomp**.
@@ -82,7 +82,7 @@ The Flatpak can read only your **Downloads** and **Documents** folders, so keep 
 one of those. To use another folder, grant read-only access first:
 
 ```
-flatpak override --user --filesystem=/path/to/roms:ro io.github.dittobyte.CtRecomp
+flatpak override --user --filesystem=/path/to/roms:ro io.github.jerbanpls.CtRecomp
 ```
 
 ### Options at launch
@@ -92,7 +92,7 @@ Engine options go after the program, for example `--hd2d` to turn on the HD-2D l
 
 ```
 ./CT_Recomp-x86_64.AppImage --hd2d
-flatpak run io.github.dittobyte.CtRecomp --hd2d
+flatpak run io.github.jerbanpls.CtRecomp --hd2d
 ```
 
 | Option | What it does |
@@ -165,7 +165,7 @@ flatpak run io.github.dittobyte.CtRecomp --hd2d
 
 **F11** switches fullscreen on and off. The window remembers its size, place and
 fullscreen state between runs (in `~/.local/share/ct-recomp/hd2d/settings.ini`, or under
-`~/.var/app/io.github.dittobyte.CtRecomp/data/` in the Flatpak, next to the saved look
+`~/.var/app/io.github.jerbanpls.CtRecomp/data/` in the Flatpak, next to the saved look
 and picture shape). A saved place is ignored if no screen shows it any more, and on
 Wayland only the size and fullscreen state are kept, as the desktop picks the place.
 `--scale` and Steam's Game Mode (always fullscreen) override it. `--help` lists the keys.
@@ -704,7 +704,7 @@ somewhere else; `--load-state FILE` starts from a state.
 
 The engine keeps its files in your user data folder, `~/.local/share/ct-recomp/` (or
 `$XDG_DATA_HOME/ct-recomp/` if you set `XDG_DATA_HOME`). In the Flatpak, that folder is
-`~/.var/app/io.github.dittobyte.CtRecomp/data/ct-recomp/`.
+`~/.var/app/io.github.jerbanpls.CtRecomp/data/ct-recomp/`.
 
 | File | What it is |
 | --- | --- |
@@ -785,7 +785,7 @@ effect, quit and delete the stamp file (or the module itself):
 ```
 rm ~/.local/share/ct-recomp/ct/ct_game.stamp
 # Flatpak:
-rm ~/.var/app/io.github.dittobyte.CtRecomp/data/ct-recomp/ct/ct_game.stamp
+rm ~/.var/app/io.github.jerbanpls.CtRecomp/data/ct-recomp/ct/ct_game.stamp
 ```
 
 The next launch builds it again. To use a different ROM file, start once with
@@ -815,7 +815,7 @@ game; for the Flatpak, add it with Steam's "Add a Non-Steam Game" and pick
   `flatpak update` so they match again. A mismatch shows up as the OpenGL error above.
 - If the window doesn't open on a Wayland desktop, try X11 through XWayland:
   `SDL_VIDEODRIVER=x11 ./CT_Recomp-x86_64.AppImage --hd2d` (for the Flatpak,
-  `flatpak run --env=SDL_VIDEODRIVER=x11 io.github.dittobyte.CtRecomp --hd2d`).
+  `flatpak run --env=SDL_VIDEODRIVER=x11 io.github.jerbanpls.CtRecomp --hd2d`).
 
 - The HD-2D code was checked against a strict GL 3.3 core profile on Mesa
   (radeonsi and llvmpipe, with every GL error reported), but never on NVIDIA's driver.
