@@ -115,13 +115,13 @@ android/
   settings.gradle, build.gradle, gradle.properties
   app/build.gradle                  SDL fetch, CMake hookup, app id, SDKs
   app/src/main/AndroidManifest.xml
-  app/src/main/java/io/github/dittobyte/ctrecomp/
+  app/src/main/java/io/github/jerbanpls/ctrecomp/
       ImportActivity.java           launcher: import the ROM and the module
       GameActivity.java             SDLActivity: libSDL2.so + libmain.so
   app/src/main/res/values/strings.xml
 ```
 
-- App id `io.github.dittobyte.ctrecomp`, minSdk 26, targetSdk and compileSdk
+- App id `io.github.jerbanpls.ctrecomp`, minSdk 26, targetSdk and compileSdk
   35, ABI `arm64-v8a` only.
 - Android Gradle plugin 8.7.3 (it needs Gradle 8.9 or later), NDK
   27.2.12479018, and CMake 3.31.6 from the SDK. The root CMakeLists.txt needs

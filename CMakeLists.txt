@@ -603,7 +603,7 @@ if(TARGET ct_sdl_engine)
     install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/ct-recomp)
     install(DIRECTORY LICENSES/ DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/ct-recomp/LICENSES)
     install(FILES THIRD_PARTY.md DESTINATION ${CMAKE_INSTALL_DATADIR}/licenses/ct-recomp)
-    set(CT_APP_ID io.github.dittobyte.CtRecomp)
+    set(CT_APP_ID io.github.jerbanpls.CtRecomp)
     install(FILES packaging/${CT_APP_ID}.desktop
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
     # The icon (packaging/icons/make_icons.py writes the SVG and the PNGs).

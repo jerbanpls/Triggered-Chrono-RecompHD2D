@@ -4,12 +4,12 @@ SPDX-FileCopyrightText: 2026 jerbanpls
 SPDX-License-Identifier: FSFAP
 -->
 <component type="desktop-application">
-  <id>io.github.dittobyte.CtRecomp</id>
+  <id>io.github.jerbanpls.CtRecomp</id>
   <name>CT Recomp</name>
   <summary>Play a recompiled SNES game built from your own ROM</summary>
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0-or-later AND MIT AND ISC</project_license>
-  <developer id="io.github.dittobyte">
+  <developer id="io.github.jerbanpls">
     <name>jerbanpls</name>
   </developer>
   <description>
@@ -23,9 +23,9 @@ SPDX-License-Identifier: FSFAP
       your machine, into your own data folder.
     </p>
   </description>
-  <url type="homepage">https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D</url>
-  <url type="bugtracker">https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/issues</url>
-  <launchable type="desktop-id">io.github.dittobyte.CtRecomp.desktop</launchable>
+  <url type="homepage">https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D</url>
+  <url type="bugtracker">https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/issues</url>
+  <launchable type="desktop-id">io.github.jerbanpls.CtRecomp.desktop</launchable>
   <provides>
     <binary>ct-recomp</binary>
   </provides>

@@ -60,7 +60,7 @@ Packs are kept in the game's folder in your user data directory:
 
 ```
 ~/.local/share/ct-recomp/ct/packs/NAME/        ($XDG_DATA_HOME/ct-recomp/ct/packs/NAME/)
-~/.var/app/io.github.dittobyte.CtRecomp/data/ct-recomp/ct/packs/NAME/   (Flatpak)
+~/.var/app/io.github.jerbanpls.CtRecomp/data/ct-recomp/ct/packs/NAME/   (Flatpak)
 ```
 
 A `NAME` that contains a `/` is taken as a directory path instead, anywhere. Exported

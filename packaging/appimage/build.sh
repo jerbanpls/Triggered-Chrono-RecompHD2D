@@ -37,7 +37,7 @@ command -v "$cmake" >/dev/null 2>&1 || {
 }
 jobs=${JOBS:-$(nproc)}
 sdl2=${SDL2:-system}
-app_id=io.github.dittobyte.CtRecomp
+app_id=io.github.jerbanpls.CtRecomp
 
 # ---- pinned downloads: URL, SHA-256 ----
 ZIG_URL=https://ziglang.org/download/0.15.2/zig-x86_64-linux-0.15.2.tar.xz

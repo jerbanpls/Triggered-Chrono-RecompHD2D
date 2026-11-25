@@ -21,10 +21,10 @@ share/ct-recomp/                     read-only data for tools/build_module.py:
     tools/*.py  recomp/*.py
     runtime/*.h  runtime/module_entry.c
     game/<id>/*.toml  game/<id>/*.c  game/<id>/tools/*.py
-share/applications/io.github.dittobyte.CtRecomp.desktop
-share/icons/hicolor/scalable/apps/io.github.dittobyte.CtRecomp.svg
-share/icons/hicolor/{16,24,32,48,64,128,256,512}x*/apps/io.github.dittobyte.CtRecomp.png
-share/metainfo/io.github.dittobyte.CtRecomp.metainfo.xml
+share/applications/io.github.jerbanpls.CtRecomp.desktop
+share/icons/hicolor/scalable/apps/io.github.jerbanpls.CtRecomp.svg
+share/icons/hicolor/{16,24,32,48,64,128,256,512}x*/apps/io.github.jerbanpls.CtRecomp.png
+share/metainfo/io.github.jerbanpls.CtRecomp.metainfo.xml
 share/licenses/ct-recomp/            LICENSE, LICENSES/, THIRD_PARTY.md
 ```
 
@@ -46,7 +46,7 @@ draws it: it writes `packaging/icons/ct-recomp.svg` and the PNGs
 (16 to 512 px, `packaging/icons/NxN/ct-recomp.png`), using rsvg-convert or
 ImageMagick. The outputs are committed, so a package build needs neither.
 CMake installs them to the hicolor theme under the app id
-(`io.github.dittobyte.CtRecomp`, matching `Icon=` in the .desktop file); the
+(`io.github.jerbanpls.CtRecomp`, matching `Icon=` in the .desktop file); the
 Flatpak gets them through the same install, and the AppImage uses the SVG as
 the AppDir icon. After changing the script, rerun it and commit the output.
 
@@ -91,7 +91,7 @@ window. It checks the ROM, builds the module with `tools/build_module.py --nativ
 the data dir unless an up-to-date one is there, loads it once to check it, and exits 0,
 or 1 with the reason on stderr. Everything goes to the engine's per-game folder,
 `$XDG_DATA_HOME/ct-recomp/<game id>/` (in the Flatpak,
-`~/.var/app/io.github.dittobyte.CtRecomp/data/ct-recomp/<game id>/`): `ct_game.so`,
+`~/.var/app/io.github.jerbanpls.CtRecomp/data/ct-recomp/<game id>/`): `ct_game.so`,
 `ct_game.stamp` (the ROM's SHA-1 and the module ABI), and `rom_path`, which the next
 normal start uses. The in-game saves (`<game id>.srm`) live there too. Nothing is
 written to the data dir, which may be read-only.
@@ -102,7 +102,7 @@ deleted.
 
 ## Flatpak
 
-`packaging/flatpak/io.github.dittobyte.CtRecomp.yml` uses org.freedesktop.Platform
+`packaging/flatpak/io.github.jerbanpls.CtRecomp.yml` uses org.freedesktop.Platform
 25.08. You need, at user or system level, `org.freedesktop.Platform//25.08`,
 `org.freedesktop.Sdk//25.08` and either a `flatpak-builder` on `PATH` or the
 `org.flatpak.Builder` app. No SDK extensions are needed.
@@ -124,17 +124,17 @@ Install it from the local repo, then run it:
 
 ```
 flatpak --user remote-add --no-gpg-verify ctrecomp-local build-flatpak-repo
-flatpak --user install ctrecomp-local io.github.dittobyte.CtRecomp
-flatpak run io.github.dittobyte.CtRecomp --rom ~/Downloads/your_dump.sfc
+flatpak --user install ctrecomp-local io.github.jerbanpls.CtRecomp
+flatpak run io.github.jerbanpls.CtRecomp --rom ~/Downloads/your_dump.sfc
 ```
 
 The first run builds the module inside the sandbox, with the runtime's `python3` and
-the bundled zig, into `~/.var/app/io.github.dittobyte.CtRecomp/data/ct-recomp/<id>/`.
+the bundled zig, into `~/.var/app/io.github.jerbanpls.CtRecomp/data/ct-recomp/<id>/`.
 Later runs reuse it and remember the ROM, so `--rom` can be left out.
 `ct-recomp --build-module ROM` does the same build, then quits after one frame.
 
 To make a single-file bundle: `flatpak build-bundle build-flatpak-repo
-CtRecomp.flatpak io.github.dittobyte.CtRecomp`.
+CtRecomp.flatpak io.github.jerbanpls.CtRecomp`.
 
 The manifest has three modules:
 - SDL2 2.32.10, built from the release tarball (pinned by SHA-256) out of tree, with
@@ -163,7 +163,7 @@ checks was run, and it stopped at the engine module.
 Permissions: Wayland with X11 as a fallback, IPC, PulseAudio, `--device=all`
 (controllers and GPU), and read-only Downloads and Documents for picking the ROM. A ROM
 stored anywhere else needs `flatpak override --user --filesystem=<dir>:ro
-io.github.dittobyte.CtRecomp`, or `--filesystem=<dir>:ro` on a single `flatpak run`.
+io.github.jerbanpls.CtRecomp`, or `--filesystem=<dir>:ro` on a single `flatpak run`.
 
 ### Test results
 
@@ -213,7 +213,7 @@ A second pass on 2026-11-13, from a clean `build.sh --user --install`, with the
 - The first run built the module in the sandbox (43 s), loaded 1,482 functions and ran
   600 frames at 60.10 Hz, 0 frames over 25 ms, 0 audio underruns, exit 0. GL was
   hardware radeonsi (Mesa 26.2.5, core 4.6).
-- The data dir `~/.var/app/io.github.dittobyte.CtRecomp/data/ct-recomp/ct/` then held
+- The data dir `~/.var/app/io.github.jerbanpls.CtRecomp/data/ct-recomp/ct/` then held
   `ct_game.so`, `ct_game.stamp` and `rom_path`. A save appears only once the game's
   SRAM changes: a run with `--poke-sram 100:10=AB` wrote `ct.srm` there (8,192 bytes,
   byte 0x10 = 0xAB), so saves land in the sandbox's data dir.

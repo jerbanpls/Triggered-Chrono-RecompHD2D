@@ -6,9 +6,9 @@
 Not an emulator wrapper: the game's 65816 code is statically recompiled to C and compiled for your machine.
 Linux first, Steam Deck and ROG Ally tuned, Windows and Android on the way.
 
-[![ci](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml/badge.svg)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml)
-[![port](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml/badge.svg)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml)
-[![release](https://img.shields.io/github/v/release/Dittobyte/Triggered-Chrono-RecompHD2D?include_prereleases&label=latest)](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/releases)
+[![ci](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml/badge.svg)](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/ci.yml)
+[![port](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml/badge.svg)](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/actions/workflows/port.yml)
+[![release](https://img.shields.io/github/v/release/jerbanpls/Triggered-Chrono-RecompHD2D?include_prereleases&label=latest)](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/releases)
 
 > **Not affiliated.** This project is not affiliated with, authorized by or endorsed by the rights holders of
 > Chrono Trigger. Game and company names are trademarks of their respective owners and are used only to say what
@@ -42,7 +42,7 @@ checked and are data, not code). The next four are how much of what actually exe
 the interpreter. The empty bar is the honest part: we cannot claim the whole game until it is recorded.
 Source data: [game/ct/progress_runs.toml](game/ct/progress_runs.toml); regenerate with `python3 tools/progress_svg.py`.
 
-Download the latest pre-release from [Releases](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/releases)
+Download the latest pre-release from [Releases](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/releases)
 (AppImage for Linux x86_64, plus the engine tarball and checksums). Then follow the [player's guide](docs/USER-GUIDE.md).
 On a Steam Deck or ROG Ally use [docs/HANDHELD.md](docs/HANDHELD.md).
 
@@ -96,7 +96,7 @@ We write down what we learn, with sources and with what we have not verified. St
 You do not need to write C to help. Pick a lane:
 
 - **Play and report.** The most useful thing right now. Tell us your GPU, distro, the look you used, and your controller.
-  Open an [issue](https://github.com/Dittobyte/Triggered-Chrono-RecompHD2D/issues). Never attach a ROM, a save or a
+  Open an [issue](https://github.com/jerbanpls/Triggered-Chrono-RecompHD2D/issues). Never attach a ROM, a save or a
   screenshot you did not take yourself.
 - **Test hardware.** Steam Deck, ROG Ally, Legion Go, DualSense, Switch Pro, Xbox and the 2026 Steam Controller. The
   checklists are in [docs/HANDHELD.md](docs/HANDHELD.md); we mark what we could not verify as unverified, so anything you

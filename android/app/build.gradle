@@ -50,12 +50,12 @@ tasks.register('fetchSdl') {
 }
 
 android {
-    namespace 'io.github.dittobyte.ctrecomp'
+    namespace 'io.github.jerbanpls.ctrecomp'
     compileSdk 35
     ndkVersion '27.2.12479018'
 
     defaultConfig {
-        applicationId 'io.github.dittobyte.ctrecomp'
+        applicationId 'io.github.jerbanpls.ctrecomp'
         minSdk 26
         targetSdk 35
         versionCode 1
